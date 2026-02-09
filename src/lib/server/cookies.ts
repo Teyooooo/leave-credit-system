@@ -20,7 +20,7 @@ export function setAuthCookie(
         path: '/',
         httpOnly: true,
         secure: !isDev,
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge
     });
 }
@@ -29,7 +29,7 @@ export function setAuthCookie(
 export function getJsonCookie<T>(cookies: Cookies, name: string): T | null {
     const value = cookies.get(name);
     if (!value) return null;
-    
+
     try {
         return JSON.parse(value) as T;
     } catch {
@@ -45,4 +45,14 @@ export function deleteCookie(cookies: Cookies, name: string) {
 // Clear multiple cookies at once
 export function clearCookies(cookies: Cookies, names: string[]) {
     names.forEach(name => deleteCookie(cookies, name));
+}
+
+export function updateCookie(
+    cookies: Cookies, 
+    name: string,
+    value: any,
+    session: Session) {
+
+    setAuthCookie(cookies, name, value, session)
+
 }

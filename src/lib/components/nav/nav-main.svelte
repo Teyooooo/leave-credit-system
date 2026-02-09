@@ -24,7 +24,7 @@
 						tooltipContent={item.title}
 						isActive={isActive(item.url, $page.url.pathname)}
 					>
-						<a href={item.url} class="flex items-center gap-2 p-1">
+						<a href={item.url} class="flex items-center gap-2 p-1 w-full">
 							<item.icon />
 							<span>{item.title}</span>
 						</a>

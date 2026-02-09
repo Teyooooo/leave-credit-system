@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies}) => {
 
     const employee = getJsonCookie<EmployeeData>(cookies, "employee_data")
 
-    console.log({employee})
+    // console.log({employee})
 
     if (employee === null){
         throw redirect(303, '/auth/signout');

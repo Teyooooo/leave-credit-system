@@ -16,9 +16,9 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
     const profilePic = session.user.user_metadata.avatar_url;
 
 
-    const { data: employee , error } = await locals.supabase
+    const { data: employee, error } = await locals.supabase
         .from("employees")
-        .select('*')
+        .select()
         .eq('email', email)  // ✅ Using server-side email
         .single();
 
@@ -26,23 +26,38 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
         console.error('Database error:', error);
     }
 
+    // Check if the profile_url in google change
+    if (profilePic !== employee?.profile_pic_url) {
+        const { error } = await locals.supabase
+            .from('employees')
+            .update({ profile_pic_url: profilePic })
+            .eq('email', email)
+
+        if ( error ) console.error('Updating Profile Picture Error:', error)
+    }
+
+
     console.log({ employee })
 
     if (employee.is_account_verified) {
         const cookie = getJsonCookie<EmployeeData>(cookies, "employee_data")
 
-        if(cookie === null){
-            setAuthCookie(cookies, "employee_data",{
-                profilePic,
+        if (cookie === null) {
+            setAuthCookie(cookies, "employee_data", {
+                uuid: employee.uuid,
+                profile_pic: profilePic,
                 employee_id: employee.employee_id,
+                employee: employee.employee,
                 name: employee.employee_name,
                 email: employee.email,
-                department_id: employee.department_id,
+                department: employee.department,
                 position: employee.position,
-                employment_status: employee.employment_status,
                 role_in_system: employee.role_in_system
-            } ,session)
+            }, session)
         }
+
+        await locals.logActivity(`${employee.employee_name} logged in`)
+
         throw redirect(303, "/dashboard")
     }
 };
@@ -57,7 +72,7 @@ export const actions: Actions = {
             return fail(401, { error: 'Not authenticated' });
         }
 
-        const email = session.user.email; 
+        const email = session.user.email;
         const profilePic = session.user.user_metadata.avatar_url;
 
         const formData = await request.formData();
@@ -87,9 +102,9 @@ export const actions: Actions = {
         console.log({ data })
 
         if (!data.is_account_verified) {
-            const { data: employee , error } = await locals.supabase
+            const { data: employee, error } = await locals.supabase
                 .from('employees')
-                .update({ is_account_verified: true })
+                .update({ is_account_verified: true, profile_pic_url: profilePic })
                 .eq('employee_id', Number(employeeID))
                 .select()
                 .single()
@@ -104,16 +119,18 @@ export const actions: Actions = {
 
             console.log("Updated data:", employee)
 
-            setAuthCookie(cookies, "employee_data",{
-                profilePic,
+            setAuthCookie(cookies, "employee_data", {
+                uuid: employee.uuid,
+                profile_pic: profilePic,
                 employee_id: employee.employee_id,
                 name: employee.employee_name,
                 email: employee.email,
-                department_id: employee.department_id,
+                department: employee.department,
                 position: employee.position,
-                employment_status: employee.employment_status,
                 role_in_system: employee.role_in_system
-            } ,session)
+            }, session)
+
+            await locals.logActivity(`${employee.employee_name}\'s account successfully verified`)
 
             throw redirect(303, "/dashboard")
         }

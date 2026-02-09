@@ -1,5 +1,17 @@
 import type { Actions } from "@sveltejs/kit";
 import { fail, redirect } from "@sveltejs/kit";
+import type { PageServerLoad } from "../$types";
+
+export const load: PageServerLoad = async ({ locals }) => {
+    const { data: { session } } = await locals.supabase.auth.getSession();
+
+    if (session) {
+        throw redirect(303, "/input-id")
+    }
+
+    return {}
+}
+
 
 export const actions: Actions = {
     login: async ({ locals: { supabase }, url }) => {

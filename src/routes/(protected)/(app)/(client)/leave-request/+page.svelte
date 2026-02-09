@@ -1,0 +1,8 @@
+<script lang="ts">
+	import { web_path_header } from '$lib/store/webDesignStore';
+	import type { PageProps } from './$types';
+
+    let { data }: PageProps = $props();
+
+    $web_path_header = [{ path_name: "Leave Request", route: '#'}]
+</script>

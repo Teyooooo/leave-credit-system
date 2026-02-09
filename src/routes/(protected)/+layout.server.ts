@@ -6,11 +6,9 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 
     // Don't redirect if we're on the auth callback route
     if (!session && !url.pathname.startsWith('/auth/callback')) {
+        console.log("redirecting to login")
         throw redirect(303, '/login');
     }
 
-    return {
-        email: session?.user?.email || null,
-        user: session?.user || null
-    };
+    return {};
 };

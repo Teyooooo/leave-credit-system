@@ -1,21 +1,26 @@
 <script lang="ts">
+	import { page } from "$app/state";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import { logo, title } from "$lib/store/webDesignStore";
 	import type { EmployeeData } from "$lib/types/data";
 	import type { MenuItem } from "$lib/types/icon";
-	import { FileUser, Gauge, Settings, ShieldUser, SquareChartGantt } from "@lucide/svelte/icons";
+	import { ArrowLeft, FilePenLine, FolderClock, Gauge, LibraryBig, ShieldUser, SquareChartGantt, UserRound, UsersRound } from "@lucide/svelte/icons";
 	import NavMain from "./nav/nav-main.svelte";
 	import NavSecondary from "./nav/nav-secondary.svelte";
 	import NavUser from "./nav/nav-user.svelte";
 
-	export let employee: EmployeeData;
+	let { employee, ...rest }: {employee: EmployeeData} = $props();
 
 
-	const user = {
+	const pathname = $derived(page.url.pathname);
+	const isAdminRoute = $derived(pathname.startsWith("/admin"));
+	const isUserAdmin = $derived(employee.role_in_system === 'Admin')
+
+	const user = $derived({
 		name: employee.name,
 		email: employee.email,
-		avatar: employee.profilePic,
-	}
+		avatar: employee.profile_pic,
+	})
 
 
 	const navMain: MenuItem[] = [
@@ -25,34 +30,62 @@
 				icon: Gauge,
 			},
 			{
-				title: "Activity Logs",
-				url: "/activity-logs",
-				icon: SquareChartGantt,
+				title: "Leave Request",
+				url: "/leave-request",
+				icon: FilePenLine,
 			},
 			{
 				title: "Account Information",
 				url: "/account-info",
-				icon: FileUser,
+				icon: UserRound,
 			},
 			{
-				title: "Settings",
-				url: "/settings",
-				icon: Settings,
+				title: "Types of Leave",
+				url: "/types-of-leave",
+				icon: LibraryBig,
 			},
 		]
 
-	const navSecondary: MenuItem[] = [
+	const adminNavMain: MenuItem[] = [
 			{
-				title: "Go to Admin",
-				url: "/admin",
-				icon: ShieldUser,
+				title: "Dashboard",
+				url: "/admin/dashboard",
+				icon: Gauge,
+			},
+			{
+				title: "Requests",
+				url: "/admin/requests",
+				icon: SquareChartGantt,
+			},
+			{
+				title: "Employees",
+				url: "/admin/employees",
+				icon: UsersRound,
+			},
+			{
+				title: "Types of Leave",
+				url: "/admin/types-of-leave",
+				icon: LibraryBig,
+			},
+			{
+				title: "Activity Logs",
+				url: "/admin/activity-logs",
+				icon: FolderClock,
+			}
+		]
+
+	const navSecondary: MenuItem[] = $derived([
+			{
+				title: isAdminRoute ? "Back to User" : "Go to Admin",
+				url: isAdminRoute ? "/dashboard" : "/admin",
+				icon: isAdminRoute ? ArrowLeft : ShieldUser,
 			},
 			
-		]
+		])
 
 </script>
 
-<Sidebar.Root collapsible="offcanvas" {...$$restProps}>
+<Sidebar.Root collapsible="offcanvas" {...rest}>
 	<Sidebar.Header>
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
@@ -64,8 +97,8 @@
 		</Sidebar.Menu>
 	</Sidebar.Header>
 	<Sidebar.Content>
-		<NavMain items={navMain} />
-		<NavSecondary items={navSecondary} class="mt-auto" />
+		<NavMain items={isAdminRoute ? adminNavMain : navMain} />
+		<NavSecondary items={isUserAdmin ? navSecondary : []} class="mt-auto" />
 	</Sidebar.Content>
 	<Sidebar.Footer>
 		<NavUser user={user} />

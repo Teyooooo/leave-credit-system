@@ -2,7 +2,7 @@ import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/stati
 import { createServerClient } from '@supabase/ssr'
 import type { Handle } from '@sveltejs/kit'
 
-export const handle: Handle = async ({ event, resolve }) => {
+export const handle: Handle = async ({event, resolve }) => {
   event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll() {
@@ -45,6 +45,28 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
 
     return { session, user }
+  }
+
+  // for logging the  activity of the users
+  event.locals.logActivity = async (details: string) => {
+    const rawValue = event.cookies.get('employee_data');
+    
+    if(!rawValue) return;
+    
+    const value = JSON.parse(rawValue)
+    
+    console.log('adding log:', value.uuid, value.name, details)
+
+    const { error } = await event.locals.supabase
+      .from('activity_logs')
+      .insert({
+        employee_uuid: value.uuid,
+        details
+      })
+
+      if(error) console.log('Having problem on adding logs')
+
+    return
   }
 
   return resolve(event, {
