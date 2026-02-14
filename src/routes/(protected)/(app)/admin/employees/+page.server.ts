@@ -2,29 +2,8 @@ import type { EmployeeDataAdmin } from '$lib/types/data';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async ({locals}) => {
-    const { data, error} = await locals.supabase
-        .from('employees')
-        .select()
-
-    if ( error ){
-        return { error: true, message: "Failed to fetch employees."}
-    }
-
-    const employees: EmployeeDataAdmin[] = data.map( item => ({
-        uuid: item.uuid as string || "",
-        profile_pic: item.profile_pic_url as string || "",
-        employee_id: item.employee_id as number,
-        name: item.employee_name as string,
-        email: item.email as string,
-        department: item.department as string,
-        position: item.position as string,
-        created_at: item.created_at as string,
-        is_account_verified: item.is_account_verified as boolean,
-        }))
-
-
-    return { employees };
+export const load = (async () => {
+    return{}
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
@@ -46,6 +25,7 @@ export const actions: Actions = {
                 department,
                 position,
                 is_account_verified: false,
+                role_in_system: 'Client'
             })
 
         if ( error ){
@@ -64,7 +44,7 @@ export const actions: Actions = {
         const position = formData.get('position') as string
         const department = formData.get('department') as string
 
-        const { error } = await locals.supabase
+        const {data, error } = await locals.supabase
             .from('employees')
             .update({
                 employee_id: id,
@@ -81,6 +61,8 @@ export const actions: Actions = {
                 message: 'Failed to update employee info. Please try again later.'
             })
         }
+
+        console.log({data})
 
         return {success: true}
     },
@@ -101,6 +83,36 @@ export const actions: Actions = {
                 message: 'Failed to delete employee info. Please try again later.'
             })
         }
+
+        return {success: true}
+    },
+    update_role_employee : async ({request, locals}) => {
+        const formData = await request.formData()
+        const uuid = formData.get('uuid') as string
+        const role_in_system = formData.get('role_in_system') as string
+
+        console.log({
+            uuid,
+            role_in_system
+        })
+
+        const { data, error } = await locals.supabase
+            .from('employees')
+            .update({
+                role_in_system
+            })
+            .eq('uuid', uuid)
+            .select()
+        
+
+        if(error){
+            return fail(500, {
+                error: true,
+                message: 'Failed to update system role. Please try again later.'
+            })
+        }
+
+        console.log({data})
 
         return {success: true}
     }

@@ -4,7 +4,7 @@
 	import { logo, title } from "$lib/store/webDesignStore";
 	import type { EmployeeData } from "$lib/types/data";
 	import type { MenuItem } from "$lib/types/icon";
-	import { ArrowLeft, FilePenLine, FolderClock, Gauge, LibraryBig, ShieldUser, SquareChartGantt, UserRound, UsersRound } from "@lucide/svelte/icons";
+	import { ArrowLeft, CalendarFold, FilePenLine, FolderClock, Gauge, LibraryBig, Megaphone, ShieldUser, SquareChartGantt, UserRound, UsersRound } from "@lucide/svelte/icons";
 	import NavMain from "./nav/nav-main.svelte";
 	import NavSecondary from "./nav/nav-secondary.svelte";
 	import NavUser from "./nav/nav-user.svelte";
@@ -33,6 +33,11 @@
 				title: "Leave Request",
 				url: "/leave-request",
 				icon: FilePenLine,
+			},
+			{
+				title: "Monthly Points Issued",
+				url: "/monthly-points-issued",
+				icon: CalendarFold,
 			},
 			{
 				title: "Account Information",
@@ -71,6 +76,11 @@
 				title: "Activity Logs",
 				url: "/admin/activity-logs",
 				icon: FolderClock,
+			},
+			{
+				title: "Announcement",
+				url: "/admin/announcement",
+				icon: Megaphone,
 			}
 		]
 

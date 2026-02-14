@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
@@ -16,12 +17,21 @@
 	let actionDropdownState = $state(false);
 	let editDialogStates = $state(false);
 	let deleteDialogStates = $state(false);
+	let updateRoleDialogStates = $state(false);
 
 	let editSubmitStates = $state(false);
 	let deleteSubmitStates = $state(false);
+	let updateRoleSubmitStates = $state(false);
 
 	let editErrorStates = $state<string | undefined>();
 	let deleteErrorStates = $state<string | undefined>();
+	let updateRoleErrorStates = $state<string | undefined>();
+
+
+	// Form Update System Role
+	let systemRole = $derived(data.role_in_system)
+	let hasChangeRole = $derived(systemRole !== data.role_in_system)
+
 
 	// Form field states
 	let formName = $derived(data.name);
@@ -33,10 +43,10 @@
 	// Check if any form field has changed
 	let hasChanges = $derived(
 		formName !== data.name ||
-			formEmail !== data.email ||
-			formIdNum !== data.employee_id ||
-			formPosition !== data.position ||
-			selected_department !== (data.department || '')
+		formEmail !== data.email ||
+		formIdNum !== data.employee_id ||
+		formPosition !== data.position ||
+		selected_department !== (data.department || '')
 	);
 
 	// Reset form when dialog closes
@@ -70,8 +80,6 @@
 		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<DropdownMenu.Group>
-			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Item
 				onSelect={(e) => {
 					e.preventDefault();
@@ -85,14 +93,21 @@
 				onSelect={(e) => {
 					e.preventDefault();
 					actionDropdownState = false;
+					updateRoleDialogStates = true;
+				}}
+			>
+				Update System Role
+			</DropdownMenu.Item>
+			<DropdownMenu.Item onSelect={() => goto(`employees/${data?.employee_id}`)}>View Employee</DropdownMenu.Item>
+			<DropdownMenu.Item
+				onSelect={(e) => {
+					e.preventDefault();
+					actionDropdownState = false;
 					deleteDialogStates = true;
 				}}
 			>
 				Delete
 			</DropdownMenu.Item>
-		</DropdownMenu.Group>
-		<DropdownMenu.Separator />
-		<DropdownMenu.Item>View Employee</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
@@ -110,7 +125,7 @@
 	<form
 		action="?/edit_employee"
 		method="post"
-		id="edit_employee"
+		id="edit_employee_{data.uuid}"
 		use:enhance={({ formData }) => {
 			editSubmitStates = true;
 			formData.append('department', selected_department);
@@ -140,14 +155,14 @@
 			</Dialog.Header>
 			<div class="grid gap-3">
 				<Label for="name">Name</Label>
-				<Input id="name" name="name" form="edit_employee" bind:value={formName} required />
+				<Input id="name" name="name" form="edit_employee_{data.uuid}" bind:value={formName} required />
 			</div>
 			<div class="grid gap-3">
 				<Label for="email">Email</Label>
 				<Input
 					id="email"
 					name="email"
-					form="edit_employee"
+					form="edit_employee_{data.uuid}"
 					type="email"
 					bind:value={formEmail}
 					required
@@ -158,7 +173,7 @@
 				<Input
 					id="id_num"
 					name="id"
-					form="edit_employee"
+					form="edit_employee_{data.uuid}"
 					type="number"
 					bind:value={formIdNum}
 					required
@@ -187,7 +202,7 @@
 				<Input
 					id="position"
 					name="position"
-					form="edit_employee"
+					form="edit_employee_{data.uuid}"
 					bind:value={formPosition}
 					required
 				/>
@@ -198,7 +213,7 @@
 			{/if}
 			<Dialog.Footer>
 				<Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
-				<Button type="submit" form="edit_employee" disabled={!hasChanges || editSubmitStates}>
+				<Button type="submit" form="edit_employee_{data.uuid}" disabled={!hasChanges || editSubmitStates}>
 					{#if editSubmitStates}
 						<Spinner />
 					{/if}
@@ -271,5 +286,95 @@
 				</Button>
 			</form>
 		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<!-- Update Role Dialog Form -->
+<Dialog.Root
+	open={updateRoleDialogStates}
+	onOpenChange={(open) => {
+		updateRoleDialogStates = open;
+
+        if(!open){
+            updateRoleErrorStates = undefined;
+        }
+	}}
+>
+	<Dialog.Content>
+		<Dialog.Header>
+			<Dialog.Title>Updating System Role ({data.name})</Dialog.Title>
+		</Dialog.Header>
+		<form
+			action="?/update_role_employee"
+			method="post"
+			id="update_role_employee"
+			use:enhance={({ formData }) => {
+				updateRoleSubmitStates = true;
+				formData.append('uuid', data.uuid);
+				formData.append('role_in_system', systemRole)
+
+				return async ({ result, update }) => {
+					updateRoleSubmitStates = false;
+					console.log({ result });
+
+					if (result.type === 'failure') {
+						const data = result.data as { message?: string };
+						updateRoleErrorStates = data?.message || 'An error occurred';
+					}
+
+					if (result.type === 'success') {
+						updateRoleDialogStates = false;
+						updateRoleErrorStates = undefined;
+					}
+
+					await update();
+				};
+			}}
+		>
+
+		<div class="grid gap-3 my-5">
+				<Label for="systemRole">Role in the System</Label>
+
+		<Select.Root type="single" name="systemRole" bind:value={systemRole}>
+		  <Select.Trigger class="w-full">
+			{systemRole}
+		  </Select.Trigger>
+		  <Select.Content>
+			<Select.Group>
+			  <Select.Label>Role</Select.Label>
+				<Select.Item
+				  value='Client'
+				  label='Client'
+				>
+				Client
+				</Select.Item>
+				<Select.Item
+				  value='Admin'
+				  label='Admin'
+				>
+				Admin
+				</Select.Item>
+			</Select.Group>
+		  </Select.Content>
+		</Select.Root>
+			</div>
+
+
+		{#if updateRoleErrorStates}
+			<p class="text-sm text-red-600">{updateRoleErrorStates}</p>
+		{/if}
+		<Dialog.Footer>
+			<Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
+				<Button
+					type="submit"
+					form="update_role_employee"
+					disabled={!hasChangeRole || updateRoleSubmitStates}
+				>
+					{#if updateRoleSubmitStates}
+						<Spinner />
+					{/if}Update
+				</Button>
+			</Dialog.Footer>
+		</form>
 	</Dialog.Content>
 </Dialog.Root>

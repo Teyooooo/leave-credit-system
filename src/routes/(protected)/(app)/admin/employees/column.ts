@@ -23,6 +23,7 @@ export const columns: ColumnDef<EmployeeDataAdmin>[] = [
             return renderComponent(EmployeeNameCell, {
                 name: row.original.name,
                 profile_pic: row.original.profile_pic,
+                id: row.original.employee_id
             });
         },
     },

@@ -1,25 +1,48 @@
 import { getJsonCookie } from "$lib/server/cookies";
-import type { EmployeeData } from "$lib/types/data";
+import type { AnnouncementInfo, EmployeeData } from "$lib/types/data";
 import { redirect } from "@sveltejs/kit";
 import type { LayoutServerLoad } from './$types';
+import { segregateAnnouncements } from "$lib";
 
 export const load: LayoutServerLoad = async ({ locals, cookies}) => {
     const { data: { session } } = await locals.supabase.auth.getSession();
+    const employee = getJsonCookie<EmployeeData>(cookies, "employee_data")
 
     // Don't redirect if we're on the auth callback route
     if (!session) {
         throw redirect(303, '/login');
     }
 
-    const employee = getJsonCookie<EmployeeData>(cookies, "employee_data")
-
-    // console.log({employee})
-
     if (employee === null){
         throw redirect(303, '/auth/signout');
     }
-    
+
+    // Getting the latest active announcements
+    const { data, error } = await locals.supabase
+    .from('announcement')
+    .select()
+    .order('created_at', {ascending: false})
+    .limit(5)
+
+    console.log({data})
+    let announcements:AnnouncementInfo[] = []
+    let activeAnnouncements:AnnouncementInfo[] = []
+    if(!error){
+        console.log("Getting announcement error:", error)
+        announcements = data?.map((i)=>({
+            title: i.title,
+            details: i.details,
+            created_at: i.created_at,
+            valid_until_start: i.valid_until_start,
+            valid_until_end: i.valid_until_end, 
+            type: 'all'
+        })) 
+        const { activeAnnouncements: segregateActive } = segregateAnnouncements(announcements)
+        activeAnnouncements = segregateActive
+    }
+
     return {
-        employee
+        employee,
+        activeAnnouncements
     };
 };

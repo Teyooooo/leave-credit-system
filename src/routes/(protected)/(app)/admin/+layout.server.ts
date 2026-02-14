@@ -5,15 +5,12 @@ import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ locals, cookies}) => {
     const { data: { session } } = await locals.supabase.auth.getSession();
+    const employee = getJsonCookie<EmployeeData>(cookies, "employee_data")
 
     // Don't redirect if we're on the auth callback route
     if (!session) {
         throw redirect(303, '/login');
     }
-
-    const employee = getJsonCookie<EmployeeData>(cookies, "employee_data")
-
-    // console.log({employee})
 
     if (employee === null){
         throw redirect(303, '/auth/signout');

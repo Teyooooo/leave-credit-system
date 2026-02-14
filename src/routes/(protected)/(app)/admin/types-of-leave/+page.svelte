@@ -11,9 +11,10 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { web_path_header } from '$lib/store/webDesignStore';
 	import type { LeaveData } from '$lib/types/data';
-	import { filterLeave } from '$lib/utils/helper';
+	import { filterArray } from '$lib/utils/helper';
 	import { Plus } from '@lucide/svelte';
 	import type { PageProps } from './$types';
+	import { toast } from "svelte-sonner";
 
 
 	let { data, form }: PageProps = $props();
@@ -29,7 +30,7 @@
     let inSubmit = $state(false)
 	
 	let searched_item = $state("")
-	let filtered_item = $derived(filterLeave(searched_item, list_of_leave))
+	let filtered_item = $derived(filterArray<LeaveData>(searched_item, list_of_leave, 'name'))
 	
     $effect(()=>{
 		console.log({form, data})
@@ -64,6 +65,7 @@
 
 						if (result.type === 'success'){
 							is_open = false
+							toast.success("Leave added successfully")
 						}
 
 						await update();

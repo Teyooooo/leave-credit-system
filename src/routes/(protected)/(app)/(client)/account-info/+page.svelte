@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { applyAction, enhance } from '$app/forms';
+	import { toast } from "svelte-sonner";
 	import { getInitials } from '$lib';
 	import AccountInfoCard from '$lib/components/account-info-card.svelte';
 	import * as Avatar from '$lib/components/ui/avatar';
@@ -68,6 +69,7 @@
 
 						employee = result.data?.employee as EmployeeData;
 						$user_name = employee.name;
+						toast.success("Your profile has been updated")
 
                         open = false
                         form = null

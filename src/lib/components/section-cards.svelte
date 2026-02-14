@@ -1,5 +1,33 @@
 <script lang="ts">
 	import * as Card from "$lib/components/ui/card/index.js";
+	import type { CreditPointsInfo } from "$lib/types/data";
+	import { convertTimestamp } from "$lib/utils/helper";
+
+	let { creditInfo, currentStatus } : {creditInfo: CreditPointsInfo | undefined, currentStatus: string} = $props()
+
+	const requestStatus = {
+		pending : {
+			color : "bg-amber-300",
+			name: "Pending"
+		},
+		none : {
+			color : "bg-gray-300",
+			name: "None"
+		},
+		approved : {
+			color : "bg-green-300",
+			name: "Approved"
+		},
+		declined : {
+			color : "bg-red-300",
+			name: "Declined"
+		}
+	}
+
+	const statusKey = $derived(currentStatus?.toLowerCase() ?? 'none') as keyof typeof requestStatus
+	const status = $derived(requestStatus[statusKey] || requestStatus.none)
+
+
 </script>
 
 <div
@@ -7,47 +35,47 @@
 >
 	<Card.Root class="@container/card">
 		<Card.Header>
-			<Card.Description>Travel Leave Points</Card.Description>
+			<Card.Description>Vacation Leave Points</Card.Description>
 			<Card.Title class="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-				1.25
+				{creditInfo?.vacation_leave_points || 0}
 			</Card.Title>
 		</Card.Header>
 		<Card.Footer class="flex-col items-start gap-1.5 text-sm">
-			<a href="##" class="text-muted-foreground hover:underline">Request a leave</a>
+			<a href="/leave-request" class="text-muted-foreground hover:underline">Request a leave</a>
 		</Card.Footer>
 	</Card.Root>
 	<Card.Root class="@container/card">
 		<Card.Header>
 			<Card.Description>Sick Leave Points</Card.Description>
 			<Card.Title class="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-				1.25
+				{creditInfo?.sick_leave_points || 0}
 			</Card.Title>
 		</Card.Header>
 		<Card.Footer class="flex-col items-start gap-1.5 text-sm">
-			<a href="##" class="text-muted-foreground hover:underline">Request a leave</a>
+			<a href="/leave-request" class="text-muted-foreground hover:underline">Request a leave</a>
 		</Card.Footer>
 	</Card.Root>
 	<Card.Root class="@container/card">
 		<Card.Header>
 			<Card.Description>Request Status</Card.Description>
 			<Card.Title class="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl flex gap-2 items-center">
-				<span class=" size-8  rounded-full bg-amber-300"></span>
-				<p>Pending</p> 
+				<span class="size-8  rounded-full {status.color}"></span>
+				<p>{status.name}</p> 
 			</Card.Title>
 		</Card.Header>
 		<Card.Footer class="flex-col items-start gap-1.5 text-sm">
-			<a href="##" class="text-muted-foreground hover:underline">View all request history</a>
+			<a href="/leave-request" class="text-muted-foreground hover:underline">View all request history</a>
 		</Card.Footer>
 	</Card.Root>
 	<Card.Root class="@container/card">
 		<Card.Header>
-			<Card.Description>Monthly Total Minutes Late</Card.Description>
+			<Card.Description>{creditInfo?.updated_at ? convertTimestamp(creditInfo?.updated_at , 'monthYear') : 'Monthly'} Late Report</Card.Description>
 			<Card.Title class="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-				40 minutes
+				{creditInfo?.late_per_mins} {(creditInfo?.late_per_mins ?? 0) > 0  ? 'minutes' : 'minute'}
 			</Card.Title>
 		</Card.Header>
 		<Card.Footer class="flex-col items-start gap-1.5 text-sm">
-			<a href="##" class="text-muted-foreground hover:underline">View account logs</a>
+			<a href="/monthly-points-issued" class="text-muted-foreground hover:underline">View monthly report</a>
 		</Card.Footer>
 	</Card.Root>
 </div>

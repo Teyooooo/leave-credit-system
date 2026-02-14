@@ -21,6 +21,7 @@
 		type SortingState
 	} from '@tanstack/table-core';
 	import { untrack } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];
@@ -181,6 +182,8 @@
 								isOpen = false;
 								selectedDepartment = '';
 								isHaveErrorForm = undefined;
+								toast.success('Employee account created successfully')
+								
 							}
 
 							await update();
