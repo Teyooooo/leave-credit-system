@@ -16,12 +16,12 @@
 	<AppSidebar {employee}/>
 	<Sidebar.Inset>
 		<SiteHeader header_paths={$web_path_header}/>
-		{#if activeAnnouncements.length === 0}
+		{#if activeAnnouncements.length != 0}
 			 <AnnouncementBar announcements={activeAnnouncements} />
 		{/if}
 		<div class="flex flex-1 flex-col">
 			<div class="@container/main flex flex-1 flex-col gap-2">
-				<div class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+				<div class="flex flex-col gap-4 py-2 md:gap-6 md:py-3">
 					{@render children()}
 				</div>
 			</div>

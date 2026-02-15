@@ -80,3 +80,17 @@ export interface AnnouncementInfo {
     valid_until_end: string, 
     type: string
 }
+
+export interface LeaveRequestInfo {
+    name: string,
+    department: string,
+    position: string,
+    date_filed: string,
+    type_leave: string,
+    leave_start: string,
+    leave_end: string,
+    total_days: string | number,
+    contact_number: string | number,
+    reason: string,
+    hr_name: string
+}

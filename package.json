@@ -52,6 +52,8 @@
 		"@supabase/ssr": "^0.8.0",
 		"@supabase/supabase-js": "^2.93.3",
 		"dayjs": "^1.11.19",
-		"mode-watcher": "^1.1.0"
+		"docxtemplater": "^3.68.1",
+		"mode-watcher": "^1.1.0",
+		"pizzip": "^3.2.0"
 	}
 }

@@ -11,10 +11,10 @@
 
 </script>
 
-<Carousel.Root class="w-full p-2" plugins={[plugin]}>
-  <Carousel.Content>
+<Carousel.Root class="w-full p-2" plugins={[plugin]} orientation="vertical" opts={{ loop: true }} >
+  <Carousel.Content class="-mt-1 h-16">
       {#each announcements as item}
-      <Carousel.Item>
+      <Carousel.Item class="pt-1">
              <Alert.Root class="flex gap-3 items-center py-2 bg-sidebar-primary/5">
                  <div>
                      <Megaphone />

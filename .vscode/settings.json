@@ -1,5 +1,10 @@
 {
 	"files.associations": {
 		"*.css": "tailwindcss"
-	}
+	},
+	"cSpell.ignoreWords": [
+		"docxtemplater",
+		"pizzip",
+		"supabase"
+	]
 }

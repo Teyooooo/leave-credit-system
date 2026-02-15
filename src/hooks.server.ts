@@ -69,9 +69,11 @@ export const handle: Handle = async ({event, resolve }) => {
     return
   }
 
-  return resolve(event, {
-    filterSerializedResponseHeaders(name) {
-      return name === 'content-range' || name === 'x-supabase-api-version'
-    },
-  })
+  const response = await resolve(event, {
+      filterSerializedResponseHeaders(name) {
+        return name === 'content-range' || name === 'x-supabase-api-version'
+      },
+    })
+
+    return response
 }
