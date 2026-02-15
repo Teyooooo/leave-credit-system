@@ -4,13 +4,12 @@
 	import { logo, title } from "$lib/store/webDesignStore";
 	import type { EmployeeData } from "$lib/types/data";
 	import type { MenuItem } from "$lib/types/icon";
-	import { ArrowLeft, CalendarFold, FilePenLine, FolderClock, Gauge, LibraryBig, Megaphone, ShieldUser, SquareChartGantt, UserRound, UsersRound } from "@lucide/svelte/icons";
+	import { ArrowLeft, CalendarFold, FilePenLine, Gauge, LibraryBig, Settings2, ShieldUser, SquareChartGantt, UserRound, UsersRound } from "@lucide/svelte/icons";
 	import NavMain from "./nav/nav-main.svelte";
 	import NavSecondary from "./nav/nav-secondary.svelte";
 	import NavUser from "./nav/nav-user.svelte";
 
 	let { employee, ...rest }: {employee: EmployeeData} = $props();
-
 
 	const pathname = $derived(page.url.pathname);
 	const isAdminRoute = $derived(pathname.startsWith("/admin"));
@@ -73,15 +72,11 @@
 				icon: LibraryBig,
 			},
 			{
-				title: "Activity Logs",
-				url: "/admin/activity-logs",
-				icon: FolderClock,
-			},
-			{
-				title: "Announcement",
-				url: "/admin/announcement",
-				icon: Megaphone,
+				title: "Settings",
+				url: "/admin/settings",
+				icon: Settings2
 			}
+
 		]
 
 	const navSecondary: MenuItem[] = $derived([

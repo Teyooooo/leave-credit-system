@@ -1,26 +1,27 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import AnnouncementContainer from '$lib/components/announcement-container.svelte';
 	import HeaderPage from '$lib/components/header-page.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { Info, Plus } from '@lucide/svelte';
-	import type { PageProps } from './$types';
-	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import { RangeCalendar } from '$lib/components/ui/range-calendar';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { RangeCalendar } from '$lib/components/ui/range-calendar';
-	import { getLocalTimeZone, today } from '@internationalized/date';
-	import { enhance } from '$app/forms';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { web_path_header } from '$lib/store/webDesignStore';
-	import AnnouncementContainer from '$lib/components/announcement-container.svelte';
+	import { getLocalTimeZone, today } from '@internationalized/date';
+	import { Info, Plus } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
+	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
     $web_path_header = [
 		{ path_name: 'Admin', route: '/admin/dashboard' },
-		{ path_name: 'Announcement', route: '/admin/announcement' }
+		{ path_name: 'Settings', route: '/admin/settings' },
+		{ path_name: 'Announcements', route: '/admin/settings/announcements' }
 	];
 
     const announcements = $derived(data.announcements)
@@ -45,7 +46,7 @@
 <div class="me-5 flex items-center">
 	<div class="grow">
 		<HeaderPage
-			title={'Announcement'}
+			title={'Announcements'}
 			message={'A centralized place for company-wide announcements and updates.'}
 		/>
 	</div>

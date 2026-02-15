@@ -1,6 +1,6 @@
 <script lang="ts">
 
-	let { title, message }: {title: String, message: String} = $props();
+	let { title, message }: {title: String, message?: String} = $props();
 
 </script>
 

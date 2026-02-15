@@ -10,7 +10,8 @@
 
     $web_path_header = [
 		{ path_name: 'Admin', route: '/admin/dashboard' },
-		{ path_name: 'Activity Logs', route: '/admin/activity-logs' }
+		{ path_name: 'Settings', route: '/admin/settings' },
+		{ path_name: 'Activity Logs', route: '/admin/settings/activity-logs' }
 	];
 
     const logs = $derived(data.logs || [])
