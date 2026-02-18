@@ -1,6 +1,10 @@
 import type { IssuedLogs } from '$lib/types/data';
-import { fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+
+interface LateReport {
+    minutes: number;
+    date: string;
+}
 
 export const load = (async ({ locals, parent }) => {
     const parentData = await parent()
@@ -14,23 +18,19 @@ export const load = (async ({ locals, parent }) => {
 
     if (error) {
         console.log("Fetching Data Error:", error)
-        return fail(500, {
-            error: true,
-            message: "Failed to fetch data to server."
-        })
+        return {
+            lateReport: undefined,
+            issuedLogs: [] as IssuedLogs[]
+        }
     }
 
-    interface LateReport {
-        minutes: number,
-        date: string
-    }
+    const rows = data ?? []
 
-    const lateReport:LateReport = {
-        minutes: data[0].late_per_mins,
-        date: data[0].created_at
-    }
+    const lateReport: LateReport | undefined = rows[0]
+        ? { minutes: rows[0].late_per_mins, date: rows[0].created_at }
+        : undefined
 
-    const formattedLogs: IssuedLogs[] = data?.map(i => ({
+    const formattedLogs: IssuedLogs[] = rows.map(i => ({
         uuid: i.uuid,
         created_at: i.created_at,
         late_per_mins: i.late_per_mins,
@@ -40,7 +40,7 @@ export const load = (async ({ locals, parent }) => {
         vacation_leave_balance: i.vacation_leave_balance,
         remarks: i.remarks || '-',
         employee_uuid: i.employee_uuid
-    })) || []
+    }))
 
     return {
         lateReport,

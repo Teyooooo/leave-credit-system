@@ -1,16 +1,16 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { convertTimestamp, getInitials } from '$lib/utils/helper';
 	import { ClipboardPenLine } from '@lucide/svelte';
+	import { toast } from 'svelte-sonner';
+	import EmployeeCreditsCard from './employee-credits-card.svelte';
 	import * as Avatar from './ui/avatar';
 	import { Button, buttonVariants } from './ui/button';
 	import * as Dialog from './ui/dialog';
-	import { Label } from './ui/label';
 	import { Input } from './ui/input';
-	import { Textarea } from './ui/textarea';
-	import { enhance } from '$app/forms';
+	import { Label } from './ui/label';
 	import { Spinner } from './ui/spinner';
-	import EmployeeCreditsCard from './employee-credits-card.svelte';
-	import { toast } from 'svelte-sonner';
+	import { Textarea } from './ui/textarea';
 
 	let { employee, creditPoints } = $props();
 
@@ -71,7 +71,7 @@
 						dialogStates = b;
 					}}
 				>
-					<Dialog.Trigger class={[buttonVariants({ variant: 'outline' }), 'py-6']}
+					<Dialog.Trigger class={[buttonVariants(), 'py-6']}
 						><ClipboardPenLine class="size-8" /></Dialog.Trigger
 					>
 					<form

@@ -1,5 +1,4 @@
 import type { CreditPointsInfo, RecentReports } from '$lib/types/data';
-import { fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({locals, parent}) => {
@@ -12,23 +11,29 @@ export const load = (async ({locals, parent}) => {
         .eq('employee_uuid', employee?.uuid)
         .single()
 
-       
+    let creditInfo: CreditPointsInfo | undefined
+
     if(currentPointsError){
             console.log("Fetching Data Error:", currentPointsError)
-            return fail(500, {
-                error: true,
-                message: "Failed to fetch data to server."
-            })
-        }
+            // return fail(500, {
+            //     error: true,
+            //     message: "Failed to fetch data to server."
+            // })
 
-    const creditInfo: CreditPointsInfo = {
-        id: currentPoints?.id,
-        created_at: currentPoints?.created_at,
-        updated_at: currentPoints?.credit_monthly_issued?.created_at,
-        late_per_mins: currentPoints?.credit_monthly_issued?.late_per_mins,
-        sick_leave_points: currentPoints?.sick_leave_points,
-        vacation_leave_points: currentPoints?.vacation_leave_points
+        creditInfo = undefined
+
+    }else{        
+        creditInfo = {
+           id: currentPoints?.id,
+           created_at: currentPoints?.created_at,
+           updated_at: currentPoints?.credit_monthly_issued?.created_at,
+           late_per_mins: currentPoints?.credit_monthly_issued?.late_per_mins,
+           sick_leave_points: currentPoints?.sick_leave_points,
+           vacation_leave_points: currentPoints?.vacation_leave_points
+       }
     }
+
+
 
     // Getting the status report
     // TODO: To be implemented fetch status report
@@ -42,19 +47,18 @@ export const load = (async ({locals, parent}) => {
         .order('created_at', {ascending: false})
         .limit(5)
 
+    let recentReports: RecentReports[] 
+    let recentIssuedLogs : RecentReports[] 
+    
     if(issuedLogsError){
         console.log("Fetching Data Error:", issuedLogsError)
-        return fail(500, {
-            error: true,
-            message: "Failed to fetch data to server."
-        })
-    }
-
-    console.log({issuedLogs})
-
-    let recentReports: RecentReports[]
-
-    const recentIssuedLogs : RecentReports[] = issuedLogs.map(i => ({
+        // return fail(500, {
+        //     error: true,
+        //     message: "Failed to fetch data to server."
+        // })
+        recentIssuedLogs = []
+    }else{
+         recentIssuedLogs = issuedLogs.map(i => ({
         timestamp: i.created_at,
         type: "Monthly Report",
         details: `
@@ -64,6 +68,7 @@ export const load = (async ({locals, parent}) => {
             ${i.remarks ? `Remark: “${i.remarks}”` : '' } 
         `
     }))
+    }
 
 
     recentReports = [...recentIssuedLogs]

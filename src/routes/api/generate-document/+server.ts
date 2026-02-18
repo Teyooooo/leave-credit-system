@@ -2,15 +2,6 @@ import type { RequestHandler } from '@sveltejs/kit';
 import Docxtemplater from 'docxtemplater';
 import PizZip from 'pizzip';
 
-//TODO: add the template upload
-/**
- * 1. add the employee leave balance sheet (bisag table ra unya na ang mga values)
- * 2. insert or update sa template.docx
- * 3. implement the request leave
- * 4. refactor the ui of the admin, add settings tab and put the activity logs, announcements, and template in there
- * 5. implement the activity log tracker
- */
-
 
 export const POST: RequestHandler = async ({ request, locals }) => {
     try {

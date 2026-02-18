@@ -41,6 +41,9 @@
 		start,
 		end
 	});
+
+	// Check if date range is complete
+	let isDateRangeValid = $derived(valid_until.start && valid_until.end);
 </script>
 
 <div class="me-5 flex items-center">
@@ -66,17 +69,24 @@
 			method="post"
 			id="add_announcement"
 			use:enhance={({ formData }) => {
+                 // Validate date range before submission
+                if (!valid_until.start || !valid_until.end) {
+                    errorState = 'Please select both start and end dates';
+                    return async ({ update }) => {
+                        await update({ reset: false });
+                    };
+                }
+
                 submitState = true
                 dialogState = true
 
 				// Convert dates to ISO strings
-				if (valid_until.start && valid_until.end) {
-					const startDate = valid_until.start.toDate(getLocalTimeZone()).toISOString();
-					const endDate = valid_until.end.toDate(getLocalTimeZone()).toISOString();
+				const startDate = valid_until.start.toDate(getLocalTimeZone()).toISOString();
+				const endDate = valid_until.end.toDate(getLocalTimeZone()).toISOString();
 
-					formData.append('valid_until_start', startDate);
-					formData.append('valid_until_end', endDate);
-				}
+				formData.append('valid_until_start', startDate);
+				formData.append('valid_until_end', endDate);
+
 
                 return async ({result, update}) => {
                     console.log({result})
@@ -141,15 +151,18 @@
 					<RangeCalendar
 						bind:value={valid_until}
 						id="valid_until"
-						class="mx-auto rounded-md border"
+						class="me-auto rounded-md border"
 					/>
 				</div>
+				{#if !isDateRangeValid}
+					<p class="text-sm text-red-600">Please select both start and end dates. To announce for a single day, click the same date twice or double-click it.</p>
+				{/if}
 				{#if errorState}
-							<p class="text-sm text-red-600">{errorState}</p>
-						{/if}
+					<p class="text-sm text-red-600">{errorState}</p>
+				{/if}
 				<Dialog.Footer>
 					<Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
-					<Button type="submit" form="add_announcement" disabled={submitState}>
+					<Button type="submit" form="add_announcement" disabled={submitState || !isDateRangeValid}>
 						{#if submitState}
 							<Spinner />
 						{/if}

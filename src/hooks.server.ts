@@ -1,8 +1,18 @@
-import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
-import { createServerClient } from '@supabase/ssr'
-import type { Handle } from '@sveltejs/kit'
+import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { createServerClient } from '@supabase/ssr';
+import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({event, resolve }) => {
+  // Fix for ngrok / reverse proxy: rewrite url.origin to the public-facing URL
+  const forwardedHost = event.request.headers.get('x-forwarded-host');
+  const forwardedProto = event.request.headers.get('x-forwarded-proto');
+
+  if (forwardedHost) {
+    event.url.host = forwardedHost;
+    event.url.protocol = forwardedProto ? `${forwardedProto}:` : event.url.protocol;
+  }
+
+
   event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll() {

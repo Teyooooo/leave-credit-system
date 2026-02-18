@@ -1,4 +1,5 @@
 import type { AnnouncementInfo } from "$lib/types/data";
+import { CalendarDate, getLocalTimeZone } from "@internationalized/date";
 
 export function getInitials(fullName: string): string {
     // Split the full name by spaces
@@ -64,18 +65,24 @@ export function segregateAnnouncements(
   const upcomingAnnouncements: AnnouncementInfo[] = [];
   const expiredAnnouncements: AnnouncementInfo[] = [];
 
-  const nowTime = now.getTime();
+  // Get today at midnight as timestamp
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
   for (const announcement of announcements) {
-    const startTime = new Date(announcement.valid_until_start).getTime();
-    const endTime = new Date(announcement.valid_until_end).getTime();
 
-    if (nowTime < startTime) {
+    // Get dates at midnight without mutating anything
+    const startDate = new Date(announcement.valid_until_start);
+    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
+    
+    const endDate = new Date(announcement.valid_until_end);
+    const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()).getTime();
+
+    if (today < start) {
       // Not started yet
       const updated = {...announcement, type:'upcoming'}
       allAnnouncements.push(updated);
       upcomingAnnouncements.push(updated);
-    } else if (nowTime > endTime) {
+    } else if (today > end) {
       // Already ended
       const updated = {...announcement, type:'expired'}
       allAnnouncements.push(updated);
@@ -113,4 +120,12 @@ export function sortArray<T, K extends keyof T>(
     const diff = aTime - bTime;
     return order === 'asc' ? diff : -diff;
   });
+}
+
+export function getTotalDays(start: CalendarDate, end: CalendarDate) {
+  console.log({start, end})
+
+	const diffInMs = end.toDate(getLocalTimeZone()).getTime() - 
+	                 start.toDate(getLocalTimeZone()).getTime();
+	return Math.floor(diffInMs / (1000 * 60 * 60 * 24)) + 1; // +1 for inclusive
 }

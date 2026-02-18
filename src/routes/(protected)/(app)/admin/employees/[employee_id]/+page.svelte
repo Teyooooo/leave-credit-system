@@ -1,11 +1,11 @@
 <script lang="ts">
 	import EmployeeCard from '$lib/components/employee-card.svelte';
+	import { columns } from '$lib/components/issued-log-table/issued-logs-column';
+	import IssuedLogsTable from '$lib/components/issued-log-table/issued-logs-table.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { web_path_header } from '$lib/store/webDesignStore';
 	import { ArrowLeft } from '@lucide/svelte';
 	import type { PageProps } from './$types';
-	import IssuedLogsTable from '$lib/components/issued-log-table/issued-logs-table.svelte';
-	import { columns } from '$lib/components/issued-log-table/issued-logs-column';
 
 
 	let { data }: PageProps = $props();
@@ -35,7 +35,10 @@
 <EmployeeCard employee={current_employee_info} {creditPoints}/>
 
 <div>
-    <p class="text-xl font-medium mx-3 mb-3">Issued Logs</p>
+    <div class="mx-3 flex justify-between items-center py-2">
+        <p class="text-xl font-medium mb-3">Issued Logs</p>
+        <Button href="/admin/employees/{params}/leave-balance-sheet">Show Leave Balance Leave</Button>
+    </div>
     <IssuedLogsTable data={issuedLogs || []} {columns} />
 </div>
 

@@ -52,6 +52,9 @@ export const actions: Actions = {
         })
     }
 
+    // logging  activity
+    await locals.logActivity('Updating the Template file')
+
     return {
         success: true,
         message: 'Template uploaded successfully'
