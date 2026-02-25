@@ -5,7 +5,7 @@ export const load = (async ({locals}) => {
 
         const { data, error} = await locals.supabase
             .from('employees')
-            .select()
+            .select(`*, department_info: departments!department( name )`)
     
         if ( error ){
             return { employees: []}
@@ -17,8 +17,8 @@ export const load = (async ({locals}) => {
             employee_id: item.employee_id as number,
             name: item.employee_name as string,
             email: item.email as string,
-            department: item.department as string,
-            position: item.position as string,
+            department: item.department_info?.name as string ?? "-",
+            position: item.position as string ?? "-",
             created_at: item.created_at as string,
             is_account_verified: item.is_account_verified as boolean,
             role_in_system: item.role_in_system as string,

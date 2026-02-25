@@ -112,7 +112,7 @@
 	let inSubmit = $state(false);
 	let selectedDepartment = $state('');
 	const triggerContent = $derived(
-		departments.find((f) => f === selectedDepartment) ?? 'Select a department'
+		$departments.find((f) => f.uuid === selectedDepartment)?.name ?? 'Select a department'
 	);
 	let isHaveErrorForm = $state<string | undefined>();
 	let employee_name = $state('')
@@ -137,9 +137,9 @@
 					<Select.Group>
 						<Select.Label>Departments</Select.Label>
 						<Select.Item value="all" label="All Departments">All Departments</Select.Item>
-						{#each departments as department}
-							<Select.Item value={department} label={department}>
-								{department}
+						{#each $departments as department}
+							<Select.Item value={department.uuid}>
+								{department.name}
 							</Select.Item>
 						{/each}
 					</Select.Group>
@@ -216,9 +216,9 @@
 								<Select.Content>
 									<Select.Group>
 										<Select.Label>Departments</Select.Label>
-										{#each departments as department}
-											<Select.Item value={department} label={department}>
-												{department}
+										{#each $departments as department}
+											<Select.Item value={department.uuid}>
+												{department.name}
 											</Select.Item>
 										{/each}
 									</Select.Group>

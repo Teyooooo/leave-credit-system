@@ -1,8 +1,26 @@
+import type { Department } from '$lib/types/data';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async () => {
-    return{}
+export const load = (async ({locals}) => {
+    
+    let { data: departments, error } = await locals.supabase
+    .from('departments')
+    .select('*, head_info: employees!dept_head( employee_name )')
+
+    let listOfDepartments: Department[] = []
+    if(!error){
+        console.log({departments})
+        listOfDepartments = departments?.map(i => ({
+            uuid: i?.uuid,
+            name: i?.name,
+            created_at: i?.created_at,
+            head_uuid: i?.dept_head,
+            head_name: i?.head_info?.employee_name
+        })) || []
+    }
+          
+    return{ listOfDepartments }
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {

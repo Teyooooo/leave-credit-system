@@ -1,8 +1,9 @@
 <script lang="ts">
 	import HeaderPage from '$lib/components/header-page.svelte';
-	import { web_path_header } from '$lib/store/webDesignStore';
+	import { departments, web_path_header } from '$lib/store/webDesignStore';
 	import type { EmployeeDataAdmin } from '$lib/types/data';
 	import { UsersRound } from '@lucide/svelte';
+	import { onMount } from 'svelte';
 	import type { PageProps } from './$types';
 	import { columns } from './column';
 	import DataTable from './data-table.svelte';
@@ -12,11 +13,11 @@
 		{ path_name: 'Employees', route: '/admin/employees' }
 	];
 	let { data }: PageProps = $props();
-
-	// svelte-ignore state_referenced_locally
-	console.log({ data });
-
 	let for_table_data = $derived<EmployeeDataAdmin[]>(data.employees || []);
+
+	onMount(() => {
+		$departments = [...data.listOfDepartments];
+	});
 
 	
 </script>

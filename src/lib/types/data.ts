@@ -152,3 +152,6 @@ export interface Department
         head_uuid: string;
         head_name: string;
 }
+
+export interface UserIcon
+    extends Pick<EmployeeData, 'uuid' | 'employee_id' | 'name' | 'profile_pic'>{}

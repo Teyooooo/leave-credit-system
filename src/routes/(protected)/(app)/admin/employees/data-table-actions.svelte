@@ -41,6 +41,9 @@
 	let formPosition = $derived(data.position);
 	let selected_department = $derived(data.department || '');
 
+	// svelte-ignore state_referenced_locally
+		console.log({selected_department})
+
 	// Check if any form field has changed
 	let hasChanges = $derived(
 		formName !== data.name ||
@@ -62,7 +65,7 @@
 	});
 
 	const triggerContent = $derived(
-		departments.find((f) => f === selected_department) ?? 'Select a department'
+		$departments.find((f) => f.uuid === selected_department)?.name ?? 'Select a department'
 	);
 </script>
 
@@ -190,9 +193,9 @@
 					<Select.Content>
 						<Select.Group>
 							<Select.Label>Departments</Select.Label>
-							{#each departments as department}
-								<Select.Item value={department} label={department}>
-									{department}
+							{#each $departments as department}
+								<Select.Item value={department.uuid}>
+									{department.name}
 								</Select.Item>
 							{/each}
 						</Select.Group>

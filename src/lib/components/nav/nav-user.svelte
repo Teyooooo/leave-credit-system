@@ -7,7 +7,7 @@
 	import { LogOut } from "@lucide/svelte/icons";
 
 
-	let { user }: { user: { name: string; email: string; avatar: string } } = $props();
+	let { user }: { user: { name: string; position: string; avatar: string } } = $props();
 
 	let displayName = $derived($user_name || user.name)
 	let callback_name = $derived(getInitials(displayName))
@@ -27,7 +27,7 @@
 			<div class="grid flex-1 text-start text-sm leading-tight">
 				<span class="truncate font-medium">{displayName}</span>
 				<span class="text-muted-foreground truncate text-xs">
-					{user.email}
+					{user.position}
 				</span>
 			</div>
 			<Button href='/auth/signout' class="dark:bg-amber-300 bg-amber-500 text-gray-900 hover:bg-amber-400 dark:hover:bg-amber-400">
