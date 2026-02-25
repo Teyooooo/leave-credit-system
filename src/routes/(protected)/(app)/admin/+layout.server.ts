@@ -17,9 +17,10 @@ export const load: LayoutServerLoad = async ({ locals, cookies}) => {
     }
 
     if (employee.role_in_system !== "Admin"){
+        await locals.logActivity('Unauthorized access attempt to Admin Dashboard')
         throw redirect(303, '/dashboard')
     }
-
+    
     return {
         employee
     };

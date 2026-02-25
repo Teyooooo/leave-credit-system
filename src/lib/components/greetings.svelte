@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { user_name } from '$lib/store/webDesignStore';
+	import { user_name } from "$lib/store/userInfo";
 
 	let { employee } = $props();
 

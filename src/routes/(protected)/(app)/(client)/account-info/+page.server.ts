@@ -70,6 +70,8 @@ export const actions: Actions = {
 
         updateCookie(cookies, "employee_data", updatedEmployeeData, session);
 
+        await locals.logActivity(`Updated employee name to "${name}" (ID: ${cookie?.employee_id})`)
+
         return { success: true, employee: updatedEmployeeData };
     }
 };

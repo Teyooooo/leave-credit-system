@@ -1,5 +1,5 @@
 import type { AnnouncementInfo } from "$lib/types/data";
-import { CalendarDate, getLocalTimeZone } from "@internationalized/date";
+import { CalendarDate, fromDate, getLocalTimeZone, toCalendarDate } from "@internationalized/date";
 
 export function getInitials(fullName: string): string {
     // Split the full name by spaces
@@ -27,14 +27,14 @@ export function filterArray <T>(search_value: string, arr:T[], where_to_find: ke
     })
 }
 
-export function convertTimestamp(timestamp: string, format: 'full' | 'date' | 'monthYear' = 'date') {
+export function convertTimestamp(timestamp: string, format: 'full' | 'date' | 'monthYear' | 'monthYearShort' = 'date') {
     const date = new Date(timestamp);
     
     switch (format) {
         case 'full':
             return date.toLocaleString('en-US', {
                 year: 'numeric',
-                month: 'short',
+                month: 'long',
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
@@ -45,12 +45,18 @@ export function convertTimestamp(timestamp: string, format: 'full' | 'date' | 'm
                 year: 'numeric',
                 month: 'long'
             });
+
+        case 'monthYearShort':
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short'
+            });
         
         case 'date':
         default:
             return date.toLocaleDateString('en-US', {
                 year: 'numeric',
-                month: 'short',
+                month: 'long',
                 day: 'numeric'
             });
     }
@@ -128,4 +134,21 @@ export function getTotalDays(start: CalendarDate, end: CalendarDate) {
 	const diffInMs = end.toDate(getLocalTimeZone()).getTime() - 
 	                 start.toDate(getLocalTimeZone()).getTime();
 	return Math.floor(diffInMs / (1000 * 60 * 60 * 24)) + 1; // +1 for inclusive
+}
+
+export function convertCalendarDate(date: string){
+  return toCalendarDate(fromDate(new Date(date), getLocalTimeZone()))
+}
+
+export function currentTimestamp(){
+  return new Date().toISOString();
+}
+
+export function isPast3Days(date: string): boolean {
+  const now = new Date("2026-02-19T08:39:57.915Z"); // for testing
+  const input = new Date(date);
+
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+
+  return now.getTime() - input.getTime() > THREE_DAYS_MS;
 }

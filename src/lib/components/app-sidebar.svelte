@@ -4,7 +4,7 @@
 	import { logo, title } from "$lib/store/webDesignStore";
 	import type { EmployeeData } from "$lib/types/data";
 	import type { MenuItem } from "$lib/types/icon";
-	import { ArrowLeft, CalendarFold, FilePenLine, Gauge, LibraryBig, Settings2, ShieldUser, SquareChartGantt, UserRound, UsersRound } from "@lucide/svelte/icons";
+	import { ArrowLeft, Building2, CalendarFold, FilePenLine, Gauge, LibraryBig, Settings2, ShieldUser, SquareChartGantt, UserRound, UsersRound } from "@lucide/svelte/icons";
 	import NavMain from "./nav/nav-main.svelte";
 	import NavSecondary from "./nav/nav-secondary.svelte";
 	import NavUser from "./nav/nav-user.svelte";
@@ -65,6 +65,11 @@
 				title: "Employees",
 				url: "/admin/employees",
 				icon: UsersRound,
+			},
+			{
+				title: "Departments",
+				url: "/admin/departments",
+				icon: Building2,	
 			},
 			{
 				title: "Types of Leave",

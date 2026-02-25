@@ -2,7 +2,6 @@
 	import Greetings from '$lib/components/greetings.svelte';
 	import SectionCards from '$lib/components/section-cards.svelte';
 	import TableRecentReports from '$lib/components/table-recent-reports.svelte';
-	import { user_points } from '$lib/store/accountDataStore.js';
 	import { web_path_header } from '$lib/store/webDesignStore.js';
 	import type { CreditPointsInfo } from '$lib/types/data.js';
 
@@ -17,13 +16,6 @@
 	const creditInfo: CreditPointsInfo | undefined = $derived(data.creditInfo)
 	const currentStatus = $derived(data.currentStatus || 'none')
     const recentReports = $derived(data.recentReports || [])
-
-	$effect(()=>{		
-		$user_points = {
-			vacation_points: creditInfo?.vacation_leave_points || 0,
-			sick_points: creditInfo?.sick_leave_points || 0
-		}
-	})
 
 </script>
 

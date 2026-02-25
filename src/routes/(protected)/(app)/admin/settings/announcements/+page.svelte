@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import AnnouncementContainer from '$lib/components/announcement-container.svelte';
+	import BackButton from '$lib/components/back-button.svelte';
 	import HeaderPage from '$lib/components/header-page.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -26,10 +27,6 @@
 
     const announcements = $derived(data.announcements)
 
-    $effect(()=>{
-        console.log(announcements)
-    })
-
 	let submitState = $state(false);
     let errorState = $state<string | undefined>();
     let dialogState = $state(false);
@@ -45,6 +42,8 @@
 	// Check if date range is complete
 	let isDateRangeValid = $derived(valid_until.start && valid_until.end);
 </script>
+
+<BackButton route={"/admin/settings"} />
 
 <div class="me-5 flex items-center">
 	<div class="grow">
@@ -89,7 +88,6 @@
 
 
                 return async ({result, update}) => {
-                    console.log({result})
                     submitState = false
 
                     if(result.type === 'failure'){
@@ -173,7 +171,6 @@
 		</form>
 	</Dialog.Root>
 </div>
-
 
 <div class="w-[50%] mx-auto mt-10">
     <AnnouncementContainer announcements={announcements || []} />

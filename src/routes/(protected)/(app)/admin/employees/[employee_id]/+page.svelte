@@ -1,10 +1,9 @@
 <script lang="ts">
+	import BackButton from '$lib/components/back-button.svelte';
 	import EmployeeCard from '$lib/components/employee-card.svelte';
 	import { columns } from '$lib/components/issued-log-table/issued-logs-column';
 	import IssuedLogsTable from '$lib/components/issued-log-table/issued-logs-table.svelte';
-	import { Button } from '$lib/components/ui/button';
 	import { web_path_header } from '$lib/store/webDesignStore';
-	import { ArrowLeft } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 
 
@@ -28,18 +27,15 @@
 
 </script>
 
-<Button class='w-fit ms-4' href="/admin/employees">
-    <ArrowLeft />
-</Button>
+<BackButton route={"/admin/employees"} />
 
 <EmployeeCard employee={current_employee_info} {creditPoints}/>
 
 <div>
     <div class="mx-3 flex justify-between items-center py-2">
         <p class="text-xl font-medium mb-3">Issued Logs</p>
-        <Button href="/admin/employees/{params}/leave-balance-sheet">Show Leave Balance Leave</Button>
+        <!-- removed leave balance -->
+        <!-- <Button href="/admin/employees/{params}/leave-balance-sheet">Show Leave Balance Sheet</Button> -->
     </div>
     <IssuedLogsTable data={issuedLogs || []} {columns} />
 </div>
-
-

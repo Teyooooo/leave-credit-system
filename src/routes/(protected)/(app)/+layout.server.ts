@@ -1,8 +1,8 @@
 import { getJsonCookie } from "$lib/server/cookies";
 import type { AnnouncementInfo, EmployeeData } from "$lib/types/data";
+import { segregateAnnouncements } from "$lib/utils/helper";
 import { redirect } from "@sveltejs/kit";
 import type { LayoutServerLoad } from './$types';
-import { segregateAnnouncements } from "$lib";
 
 export const load: LayoutServerLoad = async ({ locals, cookies}) => {
     const { data: { session } } = await locals.supabase.auth.getSession();
@@ -21,14 +21,13 @@ export const load: LayoutServerLoad = async ({ locals, cookies}) => {
     const { data, error } = await locals.supabase
     .from('announcement')
     .select()
-    .order('created_at', {ascending: false})
+    .order('valid_until_start', {ascending: false})
     .limit(5)
 
-    console.log({data})
+    // console.log({data})
     let announcements:AnnouncementInfo[] = []
     let activeAnnouncements:AnnouncementInfo[] = []
     if(!error){
-        console.log("Getting announcement error:", error)
         announcements = data?.map((i)=>({
             title: i.title,
             details: i.details,
@@ -39,6 +38,8 @@ export const load: LayoutServerLoad = async ({ locals, cookies}) => {
         })) 
         const { activeAnnouncements: segregateActive } = segregateAnnouncements(announcements)
         activeAnnouncements = segregateActive
+    }else{
+        console.log("Getting announcement error:", error)
     }
 
     return {

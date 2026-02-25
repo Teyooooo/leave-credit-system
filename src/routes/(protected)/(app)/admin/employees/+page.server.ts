@@ -1,4 +1,3 @@
-import type { EmployeeDataAdmin } from '$lib/types/data';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -32,6 +31,7 @@ export const actions: Actions = {
             return fail(500, {error: true, message: 'Failed to add new employee. Please try again.'})
         }
 
+        await locals.logActivity(`Created employee "${name}" (ID: ${id})`)
         return {success: true}
     },
     edit_employee : async ({request, locals}) => {
@@ -62,15 +62,14 @@ export const actions: Actions = {
             })
         }
 
-        console.log({data})
-
+        await locals.logActivity(`Updated employee "${name}" (ID: ${id})`)
         return {success: true}
     },
     delete_employee : async ({request, locals}) => {
         const formData = await request.formData()
         const uuid = formData.get('uuid') as string
-
-        console.log({uuid})
+        const name = formData.get('employee_name') as string
+        const id = formData.get('employee_id') as string
 
         const { error } = await locals.supabase
             .from('employees')
@@ -83,13 +82,17 @@ export const actions: Actions = {
                 message: 'Failed to delete employee info. Please try again later.'
             })
         }
-
+        
+        await locals.logActivity(`Deleting employee "${name}" (ID: ${id})`)
         return {success: true}
     },
     update_role_employee : async ({request, locals}) => {
         const formData = await request.formData()
         const uuid = formData.get('uuid') as string
         const role_in_system = formData.get('role_in_system') as string
+        const name = formData.get('employee_name') as string
+        const id = formData.get('employee_id') as string
+
 
         console.log({
             uuid,
@@ -114,6 +117,7 @@ export const actions: Actions = {
 
         console.log({data})
 
+        await locals.logActivity(`Updated system role of "${name}" to "${role_in_system}" (ID: ${id})`)
         return {success: true}
     }
 };

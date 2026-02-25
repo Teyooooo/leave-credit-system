@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
             }, session)
         }
 
-        await locals.logActivity(`${employee.employee_name} logged in`)
+        await locals.logActivity(`Logged in`)
 
         throw redirect(303, "/dashboard")
     }
@@ -130,7 +130,7 @@ export const actions: Actions = {
                 role_in_system: employee.role_in_system
             }, session)
 
-            await locals.logActivity(`${employee.employee_name}\'s account successfully verified`)
+            await locals.logActivity(`Account successfully verified`)
 
             throw redirect(303, "/dashboard")
         }

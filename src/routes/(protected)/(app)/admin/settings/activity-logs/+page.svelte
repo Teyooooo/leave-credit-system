@@ -1,4 +1,5 @@
 <script lang="ts">
+	import BackButton from '$lib/components/back-button.svelte';
 	import HeaderPage from '$lib/components/header-page.svelte';
 	import { web_path_header } from '$lib/store/webDesignStore';
 	import type { PageProps } from './$types';
@@ -17,6 +18,8 @@
     const logs = $derived(data.logs || [])
 
 </script>
+
+<BackButton route={"/admin/settings"} />
 
 <HeaderPage title={'Activity Logs'} message={'Monitor and review employee activities and system actions for tracking and compliance.'} />
 

@@ -1,3 +1,4 @@
+import { convertTimestamp } from '$lib';
 import type { RequestHandler } from '@sveltejs/kit';
 import Docxtemplater from 'docxtemplater';
 import PizZip from 'pizzip';
@@ -6,6 +7,8 @@ import PizZip from 'pizzip';
 export const POST: RequestHandler = async ({ request, locals }) => {
     try {
         const { data } = await request.json();
+        console.log({data})
+
         const { data: fileData, error } = await locals.supabase
             .storage
             .from('Template')
@@ -27,21 +30,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 
         doc.render({
-            name: `<u>${data.name}</u>`,
-            positionDepartment: `<u>${data.department} - ${data.position}</u>`,
-            dateFiled: `<u>${data.date_filed}</u>`,
-            selectedLeave: `
-            ${data.type_leave === 'Vacation Leave' ? '☑' : '☐'} Vacation Leave 
-            ${data.type_leave === 'Sick Leave' ? '☑' : '☐'} Sick Leave
-            ${(data.type_leave != 'Sick Leave') && (data.type_leave != 'Vacation Leave') ? '☑' : '☐'} Other: <u>${data.type_leave}</u>
-            `,
-            leaveStart: `<u>${data.leave_start}</u>`,
-            leaveEnd: `<u>${data.leave_end}</u>`,
-            totalDays: `<u>${data.total_days}</u>`,
-            contactNumber: `<u>${data.contact_number}</u>`,
-            reason: `<u>${data.reason}</u>`,
-            fullNameCapital: `<u>${data.name.toUpperCase()}</u>`,
-            hrFullNameCapital: `<u>${data.hr_name.toUpperCase()}</u>`,
+            "name": data.employee_name,
+            "positionDepartment": `${data.employee_department} - ${data.employee_position}`,
+            "dateFiled": convertTimestamp(data.date_filed, 'date'),
+            "selectLeave": `${data.type_leave === 'Vacation Leave' ? '[✓]' : '[  ]'} Vacation Leave ${data.type_leave === 'Sick Leave' ? '[✓]' : '[  ]'} Sick Leave ${(data.type_leave != 'Sick Leave') && (data.type_leave != 'Vacation Leave') ? '[✓]' : '[  ]'} `,
+            "otherLeave": `${(data.type_leave != 'Sick Leave') && (data.type_leave != 'Vacation Leave') ? data.type_leave : '-'}`,
+            "leaveStart": convertTimestamp(data.leave_start, 'date'),
+            "leaveEnd": convertTimestamp(data.leave_end, 'date'),
+            "totalDays": data.total_days,
+            "contactNumber": data.contact_number,
+            "reasonForLeave": data.reason,
+            "fullNameCapital": String(data.employee_name).toUpperCase(),
+            "hrFullNameCapital": String(data.hr_name).toUpperCase(),
         });
 
         //Generate as blob
@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         return new Response(blob, {
         headers: {
             'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'Content-Disposition': 'attachment; filename="generated-document.docx"',
+            'Content-Disposition': `attachment; filename="file.docx"`,
         },
         });
 

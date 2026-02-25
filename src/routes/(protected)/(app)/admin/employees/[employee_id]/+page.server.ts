@@ -1,6 +1,6 @@
+import type { CreditPointsInfo, IssuedLogs } from '$lib/types/data';
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import type { CreditPointsInfo, IssuedLogs } from '$lib/types/data';
 
 export const load = (async ({ params, parent, locals }) => {
     const { employee_id } = params
@@ -15,6 +15,7 @@ export const load = (async ({ params, parent, locals }) => {
         .from('credit_points')
         .select()
         .eq('employee_uuid', current_employee?.uuid)
+        .single()
 
 
     if(currentPointsError){
@@ -23,6 +24,8 @@ export const load = (async ({ params, parent, locals }) => {
             error: true,
             message: "Failed to fetch data to server."
         })
+    }else{
+        console.log({currentPoints})
     }
 
 
@@ -54,19 +57,19 @@ export const load = (async ({ params, parent, locals }) => {
     // Handle empty credit points - use default/null values
     let creditPoints: CreditPointsInfo | undefined = undefined;
     
-    if (currentPoints && currentPoints.length > 0) {
-        const currentMonthlyIssued = logsIssued?.find((e) => e.uuid === currentPoints[0].current_month_issued)
+    if (currentPoints) {
+        const currentMonthlyIssued = logsIssued?.find((e) => e.uuid === currentPoints.current_month_issued)
         // const monthlyIssued = currentPoints[0].credit_monthly_issued?.[0];
 
-        console.log({currentMonthlyIssued})
+        console.log({currentMonthlyIssued, currentPoints})
         
         creditPoints = {
-            id: currentPoints[0].id,
-            created_at: currentPoints[0].created_at,
+            id: currentPoints.id,
+            created_at: currentPoints.created_at,
             updated_at: currentMonthlyIssued?.created_at,
             late_per_mins: currentMonthlyIssued?.late_per_mins || 0,
-            sick_leave_points: currentPoints[0].sick_leave_points,
-            vacation_leave_points: currentPoints[0].vacation_leave_points
+            sick_leave_points: currentPoints.sick_leave_points,
+            vacation_leave_points: currentPoints.vacation_leave_points
         };
     }
 

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { applyAction, enhance } from '$app/forms';
-	import { toast } from "svelte-sonner";
 	import { getInitials } from '$lib';
 	import AccountInfoCard from '$lib/components/account-info-card.svelte';
 	import * as Avatar from '$lib/components/ui/avatar';
@@ -9,9 +8,11 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Spinner } from '$lib/components/ui/spinner';
-	import { user_name, web_path_header } from '$lib/store/webDesignStore';
+	import { user_name } from "$lib/store/userInfo";
+	import { web_path_header } from '$lib/store/webDesignStore';
 	import type { EmployeeData } from '$lib/types/data';
 	import { FileClock, SquarePen } from '@lucide/svelte/icons';
+	import { toast } from "svelte-sonner";
 	import type { PageProps } from './$types';
 
 	$web_path_header = [{path_name:'Account Information', route: '/account-info'}];
@@ -22,6 +23,7 @@
 	let employee  = $state(data.employee);
 	let open = $state(false)
 	let inSubmit = $state(false)
+	let formName = $state('')
 	
     $effect(() => {
 		// Clear form error when dialog closes
@@ -87,15 +89,15 @@
 						</Dialog.Description>
 					</Dialog.Header>
 					<div class="grid gap-3">
-						<Label for="name-1">Name</Label>
-						<Input id="name-1" name="name" form="change-name-form"/>
+						<Label for="name">Name</Label>
+						<Input id="name" name="name" bind:value={formName} form="change-name-form"/>
                         {#if form?.error}
                             <p class="text-sm text-red-600">{form?.message}</p>
                         {/if}
 					</div>
 					<Dialog.Footer>
 						<Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
-						<Button type="submit" form="change-name-form" disabled={inSubmit}>
+						<Button type="submit" form="change-name-form" disabled={inSubmit || !formName.length}>
 							{#if inSubmit}
 								 <Spinner />
 							{/if}

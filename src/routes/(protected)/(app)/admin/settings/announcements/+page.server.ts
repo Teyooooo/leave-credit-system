@@ -1,6 +1,6 @@
+import type { AnnouncementInfo } from '$lib/types/data';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import type { AnnouncementInfo } from '$lib/types/data';
 
 export const load = (async ({locals}) => {
     const { data, error } = await locals.supabase
@@ -13,6 +13,7 @@ export const load = (async ({locals}) => {
     }   
 
     const announcements: AnnouncementInfo[] = data?.map((i)=>({
+        uuid: i.uuid,
         created_at: i.created_at,
         title: i.title,
         details: i.details,
@@ -46,9 +47,33 @@ export const actions: Actions = {
             console.log("Database Error:", error)
             return fail(500, {
                 error: true,
-                message: 'Failed to add new leave. Please try again.'
+                message: 'Failed to add new announcement. Please try again.'
             })
         }
+
+        await locals.logActivity(`Created Announcement "${title}"`)
+
+        return {success: true}
+    },
+    remove_announcement : async ({request, locals}) => {
+        const formData = await request.formData()
+        const uuid = formData.get('uuid')
+        const title = formData.get('title')
+
+        const { error } = await locals.supabase
+            .from('announcement')
+            .delete()
+            .eq('uuid', uuid)
+
+        if(error){
+            console.log("Database Error:", error)
+            return fail(500, {
+                error: true,
+                message: 'Failed to delete announcement. Please try again.'
+            })
+        }
+
+        await locals.logActivity(`Deleted Announcement "${title}"`)
 
         return {success: true}
     }

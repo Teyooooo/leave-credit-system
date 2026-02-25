@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import BackButton from '$lib/components/back-button.svelte';
 	import HeaderPage from '$lib/components/header-page.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
@@ -29,6 +30,8 @@
     let uploadSubmitError = $state<string | undefined>()
 
 </script>
+
+<BackButton route={"/admin/settings"} />
 
 <HeaderPage
 	title={'Template'}

@@ -10,8 +10,8 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import type { LeaveData } from '$lib/types/data';
 	import { Clock, Pen, Search, Trash } from '@lucide/svelte';
-	import type { ActionData } from '../../routes/$types';
 	import { toast } from 'svelte-sonner';
+	import type { ActionData } from '../../routes/$types';
 
 	let { list_of_leave, form }: { list_of_leave: LeaveData[]; form?: ActionData } = $props();
 
@@ -93,7 +93,7 @@
 							 >
 								 <Dialog.Content>
 									 <Dialog.Header>
-										 <Dialog.Title>Edit Leave</Dialog.Title>
+										 <Dialog.Title>Edit Leave ({leave.name})</Dialog.Title>
 									 </Dialog.Header>
 									 <div class="grid gap-3">
 										 <Label for="name_{leave.uuid}">Name</Label>
@@ -144,7 +144,7 @@
 							 >
 							 <Dialog.Content>
 								 <Dialog.Header>
-									 <Dialog.Title>Are you absolutely sure?</Dialog.Title>
+									 <Dialog.Title>Delete Leave ({leave.name})</Dialog.Title>
 									 <Dialog.Description>
 										 This action cannot be undone. This will permanently delete this leave and remove
 										 your data from our servers.
@@ -161,6 +161,7 @@
 										 method="post"
 										 use:enhance={({formData}) => {
 											 formData.append("uuid", leave.uuid);
+											 formData.append("name", leave.name);
 											 deleteSubmitStates[leave.uuid] = true;
 	 
 											 return async ({ result, update }) => {

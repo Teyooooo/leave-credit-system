@@ -2,10 +2,8 @@
 	import HeaderPage from '$lib/components/header-page.svelte';
 	import { columns } from '$lib/components/issued-log-table/issued-logs-column';
 	import IssuedLogsTableV2 from '$lib/components/issued-log-table/issued-logs-table-v2.svelte';
-	import { Button } from '$lib/components/ui/button';
 	import { web_path_header } from '$lib/store/webDesignStore';
 	import { convertTimestamp } from '$lib/utils/helper';
-	import { Sheet } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
@@ -31,7 +29,8 @@
 </div>
 <div class="px-3 mt-10">
     <div class="flex justify-end mb-3">
-        <Button href="/monthly-points-issued/leave-balance-sheet"><Sheet /> Show Leave Balance Leave</Button>
+        <!-- remove the show leave balance -->
+        <!-- <Button href="/monthly-points-issued/leave-balance-sheet"><Sheet /> Show Leave Balance Leave</Button> -->
     </div>
     <IssuedLogsTableV2 data={issuedLogs || []} {columns}/>
 </div>

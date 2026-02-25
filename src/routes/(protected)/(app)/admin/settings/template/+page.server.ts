@@ -53,7 +53,7 @@ export const actions: Actions = {
     }
 
     // logging  activity
-    await locals.logActivity('Updating the Template file')
+    await locals.logActivity('Updated the Template file')
 
     return {
         success: true,

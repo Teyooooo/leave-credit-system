@@ -4,10 +4,13 @@
     let { creditPoints } = $props()
 
 
-    const vacation_leave_points = $derived(creditPoints?.sick_leave_points ?? 0 )
+    const vacation_leave_points = $derived(creditPoints?.vacation_leave_points ?? 0 )
     const sick_leave_points = $derived(creditPoints?.sick_leave_points ?? 0 )
     const late_per_mins = $derived(creditPoints?.late_per_mins ?? 0 )
     const latest_update_date = $derived(creditPoints?.updated_at ?? '') 
+
+    // svelte-ignore state_referenced_locally
+        console.log({creditPoints})
 
 </script>
 

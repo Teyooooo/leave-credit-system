@@ -11,6 +11,7 @@
 	import { departments } from '$lib/store/webDesignStore';
 	import type { EmployeeDataAdmin } from '$lib/types/data';
 	import EllipsisIcon from '@lucide/svelte/icons/ellipsis';
+	import { toast } from 'svelte-sonner';
 
 	let { data }: { data: EmployeeDataAdmin } = $props();
 
@@ -143,6 +144,7 @@
 				if (result.type === 'success') {
 					editDialogStates = false;
 					editErrorStates = undefined;
+					toast.success(`Employee "${formName}" updated successfully`)
 				}
 
 				await update();
@@ -151,7 +153,7 @@
 	>
 		<Dialog.Content class="w-md">
 			<Dialog.Header>
-				<Dialog.Title>Edit Employee</Dialog.Title>
+				<Dialog.Title>Edit Employee ({data.name})</Dialog.Title>
 			</Dialog.Header>
 			<div class="grid gap-3">
 				<Label for="name">Name</Label>
@@ -237,7 +239,7 @@
 >
 	<Dialog.Content>
 		<Dialog.Header>
-			<Dialog.Title>Are you absolutely sure?</Dialog.Title>
+			<Dialog.Title>Deleting Employee ({data.name})</Dialog.Title>
 			<Dialog.Description>
 				This action cannot be undone. This will permanently delete this account and remove this data
 				from our servers.
@@ -255,6 +257,8 @@
 				use:enhance={({ formData }) => {
 					deleteSubmitStates = true;
 					formData.append('uuid', data.uuid);
+					formData.append('employee_name', data.name);
+					formData.append('employee_id', String(data.employee_id));
 
 					return async ({ result, update }) => {
 						deleteSubmitStates = false;
@@ -268,6 +272,7 @@
 						if (result.type === 'success') {
 							deleteDialogStates = false;
 							deleteErrorStates = undefined;
+							toast.success(`Employee "${formName}" deleted successfully`)
 						}
 
 						await update();
@@ -312,6 +317,8 @@
 				updateRoleSubmitStates = true;
 				formData.append('uuid', data.uuid);
 				formData.append('role_in_system', systemRole)
+				formData.append('employee_name', data.name);
+				formData.append('employee_id', String(data.employee_id));
 
 				return async ({ result, update }) => {
 					updateRoleSubmitStates = false;
@@ -325,6 +332,7 @@
 					if (result.type === 'success') {
 						updateRoleDialogStates = false;
 						updateRoleErrorStates = undefined;
+						toast.success(`Employee "${data.name}" role updated to "${systemRole}" successfully`)
 					}
 
 					await update();

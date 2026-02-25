@@ -1,6 +1,10 @@
 <script lang="ts">
+	import EmployeeNameCell from '$lib/components/data-table/employee-name-cell.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import * as Table from '$lib/components/ui/table';
+	import type { LowLevelBalance } from '$lib/types/data';
+
+  let { data } : { data:LowLevelBalance[] } = $props() 
 
 </script>
 
@@ -21,18 +25,23 @@
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        <Table.Row>
-						<Table.Cell colspan={5} class="text-center text-muted-foreground">
-              No data available
-            </Table.Cell>
-					</Table.Row>
-
-        <!-- <Table.Row>
-          <Table.Cell class="font-medium">INV001</Table.Cell>
-          <Table.Cell>Paid</Table.Cell>
-          <Table.Cell>Credit Card</Table.Cell>
-          <Table.Cell class="text-right">.00</Table.Cell>
-        </Table.Row> -->
+        {#if data.length === 0}
+            <Table.Row>
+             <Table.Cell colspan={5} class="text-center text-muted-foreground">
+               No data available
+             </Table.Cell>
+            </Table.Row>
+          {:else}
+             {#each data as i}
+              <Table.Row>
+                <Table.Cell class="font-medium">{i.employee_id}</Table.Cell>
+                <Table.Cell><EmployeeNameCell name={i.name} profile_pic={i.profile_pic} id={i.employee_id} /> </Table.Cell>
+                <Table.Cell>{i.email}</Table.Cell>
+                <Table.Cell>{i.vacation_leave_points}</Table.Cell>
+                <Table.Cell>{i.sick_leave_points}</Table.Cell>
+              </Table.Row>
+             {/each}
+          {/if}
       </Table.Body>
     </Table.Root>
   </Card.Content>

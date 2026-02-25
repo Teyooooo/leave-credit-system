@@ -8,6 +8,9 @@
 	let { children, data }  = $props();
     let { employee, activeAnnouncements } = $derived(data);
 
+	// svelte-ignore state_referenced_locally
+		console.log({activeAnnouncements})
+
 </script>
 
 <Sidebar.Provider

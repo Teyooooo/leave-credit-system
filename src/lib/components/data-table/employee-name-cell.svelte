@@ -5,7 +5,7 @@
   interface Props {
     name: string;
     profile_pic?: string;
-    id: number
+    id?: number
   }
 
   let { name, profile_pic, id }: Props = $props();

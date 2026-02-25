@@ -115,6 +115,7 @@
 		departments.find((f) => f === selectedDepartment) ?? 'Select a department'
 	);
 	let isHaveErrorForm = $state<string | undefined>();
+	let employee_name = $state('')
 </script>
 
 <div class='@container/main'>
@@ -182,7 +183,7 @@
 								isOpen = false;
 								selectedDepartment = '';
 								isHaveErrorForm = undefined;
-								toast.success('Employee account created successfully')
+								toast.success(`Employee "${employee_name}" created successfully`)
 								
 							}
 
@@ -196,7 +197,7 @@
 						</Dialog.Header>
 						<div class="grid gap-3">
 							<Label for="name">Name</Label>
-							<Input id="name" name="name" form="add_employee" required />
+							<Input id="name" name="name" form="add_employee" bind:value={employee_name} required />
 						</div>
 						<div class="grid gap-3">
 							<Label for="email">Email</Label>

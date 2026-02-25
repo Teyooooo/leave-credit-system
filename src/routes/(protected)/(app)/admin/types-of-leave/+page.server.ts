@@ -69,6 +69,8 @@ export const actions: Actions = {
             description: item.description,
         }))
 
+        await locals.logActivity(`Created leave "${name}"`)
+
         return { success: true, data: list_of_leave }
     },
     edit_leave: async ({ request, locals }) => {
@@ -116,6 +118,8 @@ export const actions: Actions = {
             description: item.description,
         }))
 
+        await locals.logActivity(`Updated leave "${formData.get('name')}"`)
+
         return { success: true, data: list_of_leave };
     },
     delete_leave: async ({ request, locals }) => {
@@ -160,6 +164,8 @@ export const actions: Actions = {
             entitlement: item.entitlement,
             description: item.description,
         }))
+
+        await locals.logActivity(`Deleted leave "${formData.get('name')}"`)
 
         return { success: true, data: list_of_leave };
     }

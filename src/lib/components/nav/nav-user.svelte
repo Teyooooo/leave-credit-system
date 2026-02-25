@@ -3,7 +3,7 @@
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
 	import { Button } from "$lib/components/ui/button";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-	import { user_name } from "$lib/store/webDesignStore";
+	import { user_name } from "$lib/store/userInfo";
 	import { LogOut } from "@lucide/svelte/icons";
 
 
