@@ -27,7 +27,11 @@ export function filterArray <T>(search_value: string, arr:T[], where_to_find: ke
     })
 }
 
-export function convertTimestamp(timestamp: string, format: 'full' | 'date' | 'monthYear' | 'monthYearShort' = 'date') {
+export function convertTimestamp(
+  timestamp: string, 
+  format: 'full' | 'date' | 'monthYear' 
+    | 'monthYearShort' | 'numericFull' | 'numericMonthDay'
+    | 'numericDate' = 'date') {
     const date = new Date(timestamp);
     
     switch (format) {
@@ -50,6 +54,28 @@ export function convertTimestamp(timestamp: string, format: 'full' | 'date' | 'm
             return date.toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short'
+            });
+
+        case 'numericFull':
+          return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+        case 'numericDate':
+          return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        
+        case 'numericMonthDay':
+          return date.toLocaleDateString('en-US', {
+                month: '2-digit',
+                day: '2-digit'
             });
         
         case 'date':
@@ -151,4 +177,12 @@ export function isPast3Days(date: string): boolean {
   const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
   return now.getTime() - input.getTime() > THREE_DAYS_MS;
+}
+
+export function convertLateIntoDecimalDay(minsLate: number){
+  return minsLate/480
+} 
+
+export function calculateLateDeduction(convertedLate: number, newBalance: number){
+  return newBalance - convertedLate
 }

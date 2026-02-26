@@ -36,7 +36,7 @@ export const actions: Actions = {
             .from('employees')
             .update({ employee_name: name })
             .eq('employee_id', Number(cookie?.employee_id))
-            .select()
+            .select(`*, department_info: departments!department( name )`)
             .single()
 
         if (error) {
@@ -63,7 +63,8 @@ export const actions: Actions = {
             employee_id: employee.employee_id,
             name: employee.employee_name,
             email: employee.email,
-            department: employee.department,
+            department_uuid: employee.department,
+            department: employee.department_info?.name,
             position: employee.position,
             role_in_system: employee.role_in_system
         };

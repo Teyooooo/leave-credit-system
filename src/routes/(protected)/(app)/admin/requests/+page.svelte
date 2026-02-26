@@ -8,7 +8,7 @@
 
     $web_path_header = [
 		{ path_name: 'Admin', route: '/admin/dashboard' },
-		{ path_name: 'Requests', route: '/admin/dashboard/requests' }
+		{ path_name: 'Requests', route: '/admin/requests' }
 	];
 
 	let { employee, pendingLeave } = $derived(data)
@@ -18,5 +18,5 @@
 <HeaderPage title={"Requests"} message={"Review, approve, or reject employee leave requests in accordance with company policy."} />
 
 <div class="mx-6 min-h-96 w-[100%-1.5rem] grid gap-4">
-	<PendingApprovalContainer filedLeave={pendingLeave} hrInfo={employee} />
+	<PendingApprovalContainer filedLeave={pendingLeave} revieweeInfo={employee} historyRoute={'/admin/requests/history'} />
 </div>

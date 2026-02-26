@@ -12,7 +12,7 @@
 	import { CircleCheck, CircleX } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 
-	let { filedInfo, hrInfo }: { filedInfo: AdminFiledLeaveInfo; hrInfo: EmployeeData } = $props();
+	let { filedInfo, revieweeInfo }: { filedInfo: AdminFiledLeaveInfo; revieweeInfo: EmployeeData } = $props();
 
 	let approveDialogStates = $state<Record<string, boolean>>({});
 	let approveSubmitStates = $state<Record<string, boolean>>({});
@@ -57,11 +57,9 @@
 				action="?/approve_filed"
 				method="post"
 				use:enhance={({ formData }) => {
-					formData.append('uuid', filedInfo.filed_uuid);
-					formData.append('hr_uuid', hrInfo.uuid);
-					formData.append('hr_name', hrInfo.name);
-					formData.append('applicant_name', filedInfo.employee_name);
-					formData.append('applicant_id', filedInfo.employee_id);
+					
+					formData.append('hr_uuid', revieweeInfo.uuid);
+					formData.append('hr_name', revieweeInfo.name);
 					formData.append('applicant_uuid', filedInfo.employee_uuid);
 					formData.append('applicant_email', filedInfo.employee_email);
 					formData.append('sick_leave_points', String(filedInfo.sick_points));
@@ -70,6 +68,10 @@
 					formData.append('start_date', convertTimestamp(filedInfo.leave_start, 'date'));
 					formData.append('end_date', convertTimestamp(filedInfo.leave_end, 'date'));
 					formData.append('total_days', String(filedInfo.total_days));
+					formData.append('uuid', filedInfo.filed_uuid);
+					formData.append('applicant_name', filedInfo.employee_name);
+					formData.append('applicant_id', filedInfo.employee_id);
+
 
 					approveSubmitStates[filedInfo.filed_uuid] = true;
 
@@ -118,9 +120,10 @@
 		action="?/decline_filed"
 		method="post"
 		use:enhance={({ formData }) => {
+
+			formData.append('hr_uuid', revieweeInfo.uuid);
+			formData.append('hr_name', revieweeInfo.name);
 			formData.append('uuid', filedInfo.filed_uuid);
-			formData.append('hr_uuid', hrInfo.uuid);
-			formData.append('hr_name', hrInfo.name);
 			formData.append('applicant_name', filedInfo.employee_name);
 			formData.append('applicant_email', filedInfo.employee_email);
 			formData.append('type_leave', filedInfo.type_leave);

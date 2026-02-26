@@ -38,8 +38,8 @@ export const load = (async ({ locals, parent }) => {
         vacation_leave_earned: i.vacation_leave_earned,
         sick_leave_balance: i.sick_leave_balance,
         vacation_leave_balance: i.vacation_leave_balance,
-        remarks: i.remarks || '-',
-        employee_uuid: i.employee_uuid
+        employee_uuid: i.employee_uuid,
+        deducted_late: i?.deducted_late
     }))
 
     return {

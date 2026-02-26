@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
 
     const { data: employee, error } = await locals.supabase
         .from("employees")
-        .select()
+        .select(`*, department_info: departments!department(name)`)
         .eq('email', email)  // ✅ Using server-side email
         .single();
 
@@ -50,7 +50,8 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
                 employee: employee.employee,
                 name: employee.employee_name,
                 email: employee.email,
-                department: employee.department,
+                department_uuid: employee.department,
+                department: employee?.department_info?.name,
                 position: employee.position,
                 role_in_system: employee.role_in_system
             }, session)
@@ -106,7 +107,7 @@ export const actions: Actions = {
                 .from('employees')
                 .update({ is_account_verified: true, profile_pic_url: profilePic })
                 .eq('employee_id', Number(employeeID))
-                .select()
+                .select(`*, department_info: departments!department(name)`)
                 .single()
 
 
@@ -125,7 +126,8 @@ export const actions: Actions = {
                 employee_id: employee.employee_id,
                 name: employee.employee_name,
                 email: employee.email,
-                department: employee.department,
+                department_uuid: employee.department,
+                department: employee?.department_info?.name,
                 position: employee.position,
                 role_in_system: employee.role_in_system
             }, session)

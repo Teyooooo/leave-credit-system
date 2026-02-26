@@ -87,6 +87,10 @@ export const columns: ColumnDef<EmployeeDataAdmin>[] = [
         cell: ({ getValue }) => (getValue<boolean>() ? "Yes" : "No"),
     },
     {
+      accessorKey: "role_in_system",
+      header: "Role"  
+    },
+    {
         id: "actions",
         cell: ({ row }) => {
             // You can pass whatever you need from `row.original` to the component

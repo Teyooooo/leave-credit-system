@@ -11,9 +11,12 @@ export const load = (async ({locals}) => {
         .select(`*, 
             hr: employees!hr_uuid( employee_name ), 
             leave_name: types_of_leave!type_of_leave( name ),
-            employee_info: employees!employee_uuid( employee_name, department, position, employee_id, email, profile_pic_url, uuid )`
+            employee_info: employees!employee_uuid( employee_name, position, employee_id, email, profile_pic_url, uuid,
+                department_info: departments!department( name )
+            )`
         )
         .eq('status', 'Pending')
+        .eq('approve_by_dept_head', true)
         .order('date_filed', { ascending: false })
 
     
@@ -42,7 +45,7 @@ export const load = (async ({locals}) => {
                 employee_name: i?.employee_info?.employee_name,
                 employee_id: i?.employee_info?.employee_id,
                 employee_email: i?.employee_info?.email,
-                employee_department: i?.employee_info?.department,
+                employee_department: i?.employee_info?.department_info?.name,
                 employee_position: i?.employee_info?.position,
                 profile_pic_url: i?.employee_info?.profile_pic_url,
                 employee_points_id: credit?.id ?? 0,
@@ -83,13 +86,24 @@ export const actions: Actions = {
         const total_days = formData.get('total_days') as string
         const sick_leave_points = formData.get('sick_leave_points') as string
         const vacation_leave_points = formData.get('vacation_leave_points') as string
+
+        // check is the leave is sick or vacation
+        const where_to_update = type_leave === 'Sick Leave' ? 'sick_leave_points'
+            : type_leave === 'Vacation Leave' ? 'vacation_leave_points'
+            : 'others'
+
+        const snapshot_points = type_leave === 'Sick Leave' ? `SLP: ${sick_leave_points} `
+                              : type_leave === 'Vacation Leave' ? `VLP: ${vacation_leave_points}`
+                              : null
+        
         
         const { error } = await locals.supabase
             .from('filed_leave')
             .update({
                 status: 'Approve',
                 hr_uuid: hr_uuid,
-                processed_at: currentTimestamp()
+                processed_at: currentTimestamp(),
+                leave_points_snapshot: snapshot_points
             })
             .eq('uuid', uuid)
 
@@ -100,10 +114,6 @@ export const actions: Actions = {
             })
         }
 
-        const where_to_update = type_leave === 'Sick Leave' ? 'sick_leave_points'
-                              : type_leave === 'Vacation Leave' ? 'vacation_leave_points'
-                              : 'others'
-
         const updated_points = type_leave === 'Sick Leave' ? Number(sick_leave_points) - Number(total_days)
                               : type_leave === 'Vacation Leave' ? Number(vacation_leave_points) - Number(total_days)
                               : 0
@@ -112,9 +122,16 @@ export const actions: Actions = {
         .from('credit_points')
         .update({ [where_to_update]:  updated_points})
         .eq('employee_uuid', applicant_uuid)
+
+        if(creditPointsError){
+            return fail(500, {
+                error: true,
+                message: 'Failed to update points. Try again later.'
+            })
+        }
           
 
-        await locals.logActivity(`Approved leave application for ${applicant_name} (ID: ${applicant_id})`)
+        await locals.logActivity(`Approved leave application for ${applicant_name} (ID: ${applicant_id}) as a HR`)
 
         await sendLeaveEmail('approved', applicant_email, leaveApprovedTemplate(applicant_name, type_leave, start_date, end_date, Number(total_days), hr_name))
 
@@ -127,6 +144,7 @@ export const actions: Actions = {
 
         const uuid = formData.get('uuid') as string
         const applicant_name = formData.get('applicant_name') as string
+        const applicant_id = formData.get('applicant_id') as string
         const applicant_email = formData.get('applicant_email') as string
         const hr_uuid = formData.get('hr_uuid') as string
         const hr_name = formData.get('hr_name') as string
@@ -141,7 +159,8 @@ export const actions: Actions = {
             .update({
                 status: 'Decline',
                 hr_uuid: hr_uuid,
-                processed_at: currentTimestamp()
+                processed_at: currentTimestamp(),
+                decline_reason: reason
             })
             .eq('uuid', uuid)
 
@@ -152,7 +171,7 @@ export const actions: Actions = {
             })
         }
 
-        await locals.logActivity(`Declined leave application for ${formData.get('applicant_name')} (ID: ${formData.get('applicant_id')})`)
+        await locals.logActivity(`Declined leave application for ${applicant_name} (ID: ${applicant_id}) as a HR`)
 
         await sendLeaveEmail('declined', applicant_email, leaveDeclinedTemplate(applicant_name, type_leave, start_date, end_date, Number(total_days), hr_name, reason))
 

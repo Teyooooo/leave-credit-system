@@ -144,7 +144,7 @@
 					};
 				}}
 			>
-				<Dialog.Content class="min-w-137.5">
+				<Dialog.Content class="w-sm">
 					<Dialog.Header>
 						<Dialog.Title>File a Leave</Dialog.Title>
 					</Dialog.Header>
@@ -184,7 +184,7 @@
 							<p class="text-sm">Total Days: {totalDays}</p>
 						</div>
 						<div class="grid gap-2">
-							<RangeCalendar bind:value={date_range} class="rounded-lg border" numberOfMonths={2} />
+							<RangeCalendar bind:value={date_range} class="rounded-lg border w-fit" />
 
 							{#if !isDateRangeValid}
 								<p class="text-sm text-red-600">Please select both start and end dates. To announce for a single day, click the same date twice or double-click it.</p>

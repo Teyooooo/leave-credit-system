@@ -3,6 +3,7 @@
 	import EmployeeCard from '$lib/components/employee-card.svelte';
 	import { columns } from '$lib/components/issued-log-table/issued-logs-column';
 	import IssuedLogsTable from '$lib/components/issued-log-table/issued-logs-table.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import { web_path_header } from '$lib/store/webDesignStore';
 	import type { PageProps } from './$types';
 
@@ -36,6 +37,8 @@
         <p class="text-xl font-medium mb-3">Issued Logs</p>
         <!-- removed leave balance -->
         <!-- <Button href="/admin/employees/{params}/leave-balance-sheet">Show Leave Balance Sheet</Button> -->
+
+        <Button href='/admin/requests/history?employee={current_employee_info?.name}'>View Filed Leave History</Button>
     </div>
     <IssuedLogsTable data={issuedLogs || []} {columns} />
 </div>

@@ -1,3 +1,4 @@
+import { calculateLateDeduction, convertLateIntoDecimalDay } from '$lib';
 import type { CreditPointsInfo, IssuedLogs } from '$lib/types/data';
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
@@ -20,10 +21,6 @@ export const load = (async ({ params, parent, locals }) => {
 
     if(currentPointsError){
         console.log("Fetching Data Error:", currentPointsError)
-        return fail(500, {
-            error: true,
-            message: "Failed to fetch data to server."
-        })
     }else{
         console.log({currentPoints})
     }
@@ -36,10 +33,6 @@ export const load = (async ({ params, parent, locals }) => {
 
     if(logsIssuedError){
         console.log("Fetching Data Error:", currentPointsError)
-        return fail(500, {
-            error: true,
-            message: "Failed to fetch data to server."
-        })
     }
 
     const formattedLogs: IssuedLogs[] = logsIssued?.map(i=>({
@@ -50,8 +43,8 @@ export const load = (async ({ params, parent, locals }) => {
         vacation_leave_earned: i.vacation_leave_earned,
         sick_leave_balance: i.sick_leave_balance,
         vacation_leave_balance: i.vacation_leave_balance,
-        remarks: i.remarks || '-',
-        employee_uuid: i.employee_uuid
+        employee_uuid: i.employee_uuid,
+        deducted_late: i?.deducted_late
     })) || []
 
     // Handle empty credit points - use default/null values
@@ -68,7 +61,7 @@ export const load = (async ({ params, parent, locals }) => {
             created_at: currentPoints.created_at,
             updated_at: currentMonthlyIssued?.created_at,
             late_per_mins: currentMonthlyIssued?.late_per_mins || 0,
-            sick_leave_points: currentPoints.sick_leave_points,
+            sick_leave_points: currentPoints.sick_leave_points ,
             vacation_leave_points: currentPoints.vacation_leave_points
         };
     }
@@ -90,9 +83,18 @@ export const actions: Actions = {
         const vacation_leave_earned = Number(formData.get('vacation_leave'))
         const sick_leave_earned = Number(formData.get('sick_leave')) 
         const late_per_mins = Number(formData.get('balance_brought_forward'))
-        const remarks = formData.get('remarks')
         const sick_leave_balance = Number(formData.get('sick_leave_balance'))
         const vacation_leave_balance = Number(formData.get('vacation_leave_balance'))
+
+
+        // deduct late to vacation_balance
+        let deductedVacationBalance = vacation_leave_balance + vacation_leave_earned
+        let convertedLate = 0
+        if(late_per_mins > 0){
+            convertedLate = convertLateIntoDecimalDay(late_per_mins)
+            const incrementedBalance = vacation_leave_balance + vacation_leave_earned
+            deductedVacationBalance = calculateLateDeduction(convertedLate, incrementedBalance)
+        }
 
         // add to database
         const { data, error: errorMonthlyIssued } = await locals.supabase
@@ -102,9 +104,9 @@ export const actions: Actions = {
                 vacation_leave_earned,
                 sick_leave_earned,
                 late_per_mins,
-                remarks,
                 sick_leave_balance,
-                vacation_leave_balance
+                vacation_leave_balance,
+                deducted_late: convertedLate.toFixed(3)
             })
             .select('uuid')
 
@@ -123,8 +125,8 @@ export const actions: Actions = {
         const { data: updateData, error: errorIncrementExisting } = await locals.supabase
             .from('credit_points')
             .update({
-                vacation_leave_points: vacation_leave_balance + vacation_leave_earned,
-                sick_leave_points: sick_leave_balance + sick_leave_earned,
+                vacation_leave_points: deductedVacationBalance.toFixed(3),
+                sick_leave_points: (sick_leave_balance + sick_leave_earned).toFixed(3),
                 current_month_issued: monthly_issued_uuid
             })
             .eq('employee_uuid', employee_uuid)
@@ -137,8 +139,8 @@ export const actions: Actions = {
             const { error } = await locals.supabase
                 .from('credit_points')
                 .insert({
-                    vacation_leave_points: vacation_leave_balance + vacation_leave_earned,
-                    sick_leave_points: sick_leave_balance + sick_leave_earned,
+                    vacation_leave_points: deductedVacationBalance.toFixed(3),
+                    sick_leave_points: (sick_leave_balance + sick_leave_earned).toFixed(3),
                     current_month_issued: monthly_issued_uuid,
                     employee_uuid
                 })

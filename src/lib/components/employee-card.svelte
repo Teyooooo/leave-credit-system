@@ -10,7 +10,6 @@
 	import { Input } from './ui/input';
 	import { Label } from './ui/label';
 	import { Spinner } from './ui/spinner';
-	import { Textarea } from './ui/textarea';
 
 	let { employee, creditPoints } = $props();
 
@@ -140,7 +139,7 @@
 									type="number"
 								/>
 							</div>
-							<div class="grid gap-3">
+							<!-- <div class="grid gap-3">
 								<Label for="remarks">Remarks</Label>
 								<Textarea
 									id="remarks"
@@ -148,7 +147,7 @@
 									form="add_credits"
 									placeholder="Type here..."
 								/>
-							</div>
+							</div> -->
 							{#if errorStates}
 								<p class="text-sm text-red-600">{errorStates}</p>
 							{/if}

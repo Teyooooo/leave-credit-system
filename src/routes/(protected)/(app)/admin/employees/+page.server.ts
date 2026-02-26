@@ -74,6 +74,7 @@ export const actions: Actions = {
             .eq('uuid', uuid)
 
         if(error){
+            console.log('Failed to update employee info:', error)
             return fail(500, {
                 error: true,
                 message: 'Failed to update employee info. Please try again later.'

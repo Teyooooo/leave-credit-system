@@ -1,5 +1,7 @@
 
 import { convertTimestamp } from "$lib";
+import DataTableDeductedLateCell from "$lib/components/data-table/data-table-deducted-late-cell.svelte";
+import DataTableLateCell from "$lib/components/data-table/data-table-late-cell.svelte";
 import DataTableTimestampButton from "$lib/components/data-table/data-table-timestamp-button.svelte";
 import { renderComponent } from "$lib/components/ui/data-table";
 import type { IssuedLogs } from "$lib/types/data";
@@ -15,7 +17,7 @@ export const columns: ColumnDef<IssuedLogs>[] = [
             column: column, // Add this
         }),
         cell: ({ getValue }) => {
-            return convertTimestamp(getValue<string>(), "full");
+            return convertTimestamp(getValue<string>(), "date");
             ;
         }
     },
@@ -29,7 +31,12 @@ export const columns: ColumnDef<IssuedLogs>[] = [
   },
   {
     accessorKey: "late_per_mins",
-    header: "Late",
+    header: "Balance Brought Forward",
+    cell: ({ row }) => {
+        return renderComponent(DataTableLateCell, {
+            value: row.original.late_per_mins,
+        });
+    }
   },
   {
     accessorKey: "sick_leave_balance",
@@ -40,7 +47,12 @@ export const columns: ColumnDef<IssuedLogs>[] = [
     header: "Last Vacation Leave Balance",
   },
   {
-    accessorKey: "remarks",
-    header: "Remarks",
+    accessorKey: "deducted_late",
+    header: "Vacation Absence Undertime with Pay",
+    cell: ({ row }) => {
+        return renderComponent(DataTableDeductedLateCell, {
+            value: row.original.deducted_late,
+        });
+    }
   }
 ];

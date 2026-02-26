@@ -29,6 +29,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies}) => {
     let activeAnnouncements:AnnouncementInfo[] = []
     if(!error){
         announcements = data?.map((i)=>({
+            uuid: i.uuid,
             title: i.title,
             details: i.details,
             created_at: i.created_at,

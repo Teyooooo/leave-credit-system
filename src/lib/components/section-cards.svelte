@@ -64,14 +64,14 @@
 			</Card.Title>
 		</Card.Header>
 		<Card.Footer class="flex-col items-start gap-1.5 text-sm">
-			<a href="/leave-request" class="text-muted-foreground hover:underline">View all request history</a>
+			<a href="/leave-request/history" class="text-muted-foreground hover:underline">View all request history</a>
 		</Card.Footer>
 	</Card.Root>
 	<Card.Root class="@container/card">
 		<Card.Header>
 			<Card.Description>{creditInfo?.updated_at ? convertTimestamp(creditInfo?.updated_at , 'monthYear') : 'Monthly'} Late Report</Card.Description>
 			<Card.Title class="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-				{creditInfo?.late_per_mins} {(creditInfo?.late_per_mins ?? 0) > 0  ? 'minutes' : 'minute'}
+				{creditInfo?.late_per_mins ?? 0} {(creditInfo?.late_per_mins ?? 0) > 0  ? 'minutes' : 'minute'}
 			</Card.Title>
 		</Card.Header>
 		<Card.Footer class="flex-col items-start gap-1.5 text-sm">

@@ -4,6 +4,7 @@ export interface EmployeeData {
     employee_id: number,
     name: string,
     email: string,
+    department_uuid: string,
     department: string,
     position: string,
     role_in_system: string
@@ -52,8 +53,8 @@ export interface IssuedLogs{
     vacation_leave_earned: number,
     sick_leave_balance: number,
     vacation_leave_balance: number,
-    remarks: string,
-    employee_uuid: string
+    employee_uuid: string,
+    deducted_late: number,
 }
 
 export interface RecentReports {
@@ -128,6 +129,8 @@ export type LeaveStatus = 'none' | 'pending' | 'approved' | 'declined'
 export interface LeaveHistory extends AdminFiledLeaveInfo {
     status: string;
     processed_at: string;
+    decline_reason: string;
+    leave_points_snapshot: string;
 }
 
 export interface AdminDashboardInfo {

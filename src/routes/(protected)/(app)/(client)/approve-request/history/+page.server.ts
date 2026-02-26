@@ -5,21 +5,32 @@ import type { PageServerLoad } from './$types';
 export const load = (async ({locals, parent}) => {
     const { employee } = await parent()
 
-    if (!employee?.uuid) {
-        console.log({employee})
-        return { leaveHistory: [] };
+    console.log({ employee })
+
+    // getting the list of pending request in the same department
+    // unahon og kuha ang mga list of employees sa department
+    let { data: employees, error: employeesError } = await locals.supabase
+        .from('employees')
+        .select('uuid')
+        .eq('department', employee.department_uuid)
+
+    let listOfEmployeeUuids: string[] = []
+    if (!employeesError) {
+        console.log({ employees })
+        listOfEmployeeUuids = employees?.map(i => (i?.uuid)) || []
     }
 
     const { data, error } = await locals.supabase
             .from('filed_leave')
             .select(`*, 
-                hr_info: employees!hr_uuid( employee_name ), 
+                hr: employees!hr_uuid( employee_name ), 
                 leave_name: types_of_leave!type_of_leave( name ),
                 employee_info: employees!employee_uuid( employee_name, position, employee_id, email, profile_pic_url, uuid,
-                    department_info: departments!department(name) )`
+                    department_info: departments!department( name )
+                )`
             )
+            .in('employee_uuid', listOfEmployeeUuids)
             .in('status', ['Approve', 'Decline'])
-            .eq('employee_uuid', employee.uuid)
             .order('date_filed', { ascending: false })
     
         
@@ -46,12 +57,12 @@ export const load = (async ({locals, parent}) => {
                 total_days: getTotalDays(convertCalendarDate(i?.leave_start), convertCalendarDate(i?.leave_end)),
                 contact_number: i?.contact_number,
                 reason: i?.reason,
-                hr_name: i?.hr_info?.employee_name ?? '-',
+                hr_name: i?.hr?.employee_name ?? '-',
                 status: i?.status,
                 processed_at: i?.processed_at,
                 decline_reason: i?.decline_reason,
                 leave_points_snapshot: i?.leave_points_snapshot
-            })) 
+            }))
             }
 
     

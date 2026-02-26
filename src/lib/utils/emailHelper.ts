@@ -25,7 +25,7 @@ export function leaveApprovedTemplate(
   startDate: string,
   endDate: string,
   days: number,
-  approvedBy: string,
+  approvedBy: string
 ) {
   return `
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f8;">
@@ -102,7 +102,7 @@ export function leaveApprovedTemplate(
             <tr>
                 <td style="background-color:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #f0f0f0;">
                 <p style="margin:0;font-size:12px;color:#9ca3af;">
-                    This is an automated message from HR System. Please do not reply to this email.
+                    This is an automated message from Leave Credit System. Please do not reply to this email.
                 </p>
                 </td>
             </tr>
@@ -122,6 +122,7 @@ export function leaveDeclinedTemplate(
   days: number,
   reviewedBy: string,
   reason: string,
+  isHr: boolean = true
 ) {
   return `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f8;">
@@ -156,7 +157,7 @@ export function leaveDeclinedTemplate(
                 Hi <strong>${name}</strong>,
               </p>
               <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6;">
-                We regret to inform you that your leave request has been <strong style="color:#dc2626;">declined</strong>. Here's a summary:
+                We regret to inform you that your leave request has been <strong style="color:#dc2626;">declined</strong> by your ${isHr ? 'HR' : 'Department Head'}. Here's a summary:
               </p>
 
               <!-- Info Table -->
@@ -203,7 +204,7 @@ export function leaveDeclinedTemplate(
           <tr>
             <td style="background-color:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #f0f0f0;">
               <p style="margin:0;font-size:12px;color:#9ca3af;">
-                This is an automated message from HR System. Please do not reply to this email.
+                This is an automated message from Leave Credit System. Please do not reply to this email.
               </p>
             </td>
           </tr>

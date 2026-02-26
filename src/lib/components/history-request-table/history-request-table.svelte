@@ -1,4 +1,5 @@
 <script lang="ts" generics="TData, TValue">
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
 	import { Input } from '$lib/components/ui/input';
@@ -23,7 +24,7 @@
 
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 15 });
 	let sorting = $state<SortingState>([{ id: 'processed_at', desc: true }]);
-	let globalFilter = $state('');
+	let globalFilter = $derived(page.url.searchParams.get('employee') ?? '')
 	let columnFilters = $state<ColumnFiltersState>([]);
 
 	const table = createSvelteTable({

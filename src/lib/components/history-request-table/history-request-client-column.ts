@@ -1,4 +1,4 @@
-import DownloadCell from "$lib/components/history-request-table/download-cell.svelte";
+import HistoryRequestTableAction from "$lib/components/history-request-table/history-request-table-action.svelte";
 import StatusCell from "$lib/components/history-request-table/status-cell.svelte";
 import { renderComponent } from "$lib/components/ui/data-table";
 import type { LeaveHistory } from "$lib/types/data";
@@ -11,7 +11,7 @@ export const columns: ColumnDef<LeaveHistory>[] = [
         accessorKey: "date_filed",
         header: "Filed At",
         cell: ({row}) => {
-            return `${convertTimestamp(row.original.date_filed, 'full')}`
+            return `${convertTimestamp(row.original.date_filed, 'numericFull')}`
         },
     },
     {
@@ -22,7 +22,7 @@ export const columns: ColumnDef<LeaveHistory>[] = [
         accessorKey: "leave_start",
         header: "Leave Date",
         cell: ({ row }) => {
-            return `${convertTimestamp(row.original.leave_start, "date")} - ${convertTimestamp(row.original.leave_end, "date")}`;
+            return `${convertTimestamp(row.original.leave_start, "numericMonthDay")} - ${convertTimestamp(row.original.leave_end, "numericMonthDay")}`;
         },
     },
     {
@@ -32,12 +32,18 @@ export const columns: ColumnDef<LeaveHistory>[] = [
     {
         accessorKey: "hr_name",
         header: "Processed By",
+        cell: ({row})=>{
+            if(row.original.status === 'Decline' && row.original.hr_name === '-'){
+                return 'Department Head'
+            }
+            return row.original.hr_name
+        }
     },
     {
         accessorKey: "processed_at",
         header: "Processed At",
         cell: ({row}) => {
-            return `${convertTimestamp(row.original.processed_at, 'full')}`
+            return `${convertTimestamp(row.original.processed_at, 'numericDate')}`
         },
     }
     ,
@@ -51,12 +57,10 @@ export const columns: ColumnDef<LeaveHistory>[] = [
         },
     },
     {
-        accessorKey: "action",
-        header: "Action",
+        id: "actions",
         cell: ({ row }) => {
-        return renderComponent(DownloadCell, {
-            data: row.original,
-        });
-    },
+        // You can pass whatever you need from `row.original` to the component
+        return renderComponent(HistoryRequestTableAction, { data: row.original });
+        },
     }
 ];

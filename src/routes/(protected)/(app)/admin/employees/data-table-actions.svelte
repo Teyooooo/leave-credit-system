@@ -39,7 +39,7 @@
 	let formEmail = $derived(data.email);
 	let formIdNum = $derived(data.employee_id);
 	let formPosition = $derived(data.position);
-	let selected_department = $derived(data.department || '');
+	let selected_department = $derived($departments.find((f) => f.name === data.department)?.uuid || '');
 
 	// svelte-ignore state_referenced_locally
 		console.log({selected_department})
