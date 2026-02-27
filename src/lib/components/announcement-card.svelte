@@ -73,7 +73,7 @@
     {/if}
     <Dialog.Footer>
         <Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
-        <form action="?/remove_announcement" method="post" id="remove_announcement_{item.uuid}" use:enhance={
+        <form action="?/remove_announcement" method="POST" id="remove_announcement_{item.uuid}" use:enhance={
             ({formData})=>{
 
                 submitState = true

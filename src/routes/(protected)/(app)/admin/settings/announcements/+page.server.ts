@@ -60,6 +60,8 @@ export const actions: Actions = {
         const uuid = formData.get('uuid')
         const title = formData.get('title')
 
+
+
         const { error } = await locals.supabase
             .from('announcement')
             .delete()

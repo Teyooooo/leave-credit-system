@@ -144,7 +144,7 @@
 					};
 				}}
 			>
-				<Dialog.Content class="w-sm">
+				<Dialog.Content class="w-sm max-h-[80vh] overflow-y-auto">
 					<Dialog.Header>
 						<Dialog.Title>File a Leave</Dialog.Title>
 					</Dialog.Header>
