@@ -6,5 +6,11 @@ export default defineConfig({
     plugins: [tailwindcss(), sveltekit()], 
     server: {
         allowedHosts: ['.ngrok-free.app', '.ngrok.io']
+    },
+    build: {
+        minify: 'esbuild'
+    },
+    esbuild: {
+        drop: ['console', 'debugger']
     }
 });
