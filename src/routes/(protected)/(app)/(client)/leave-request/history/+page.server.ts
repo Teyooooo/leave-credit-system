@@ -10,17 +10,27 @@ export const load = (async ({locals, parent}) => {
         return { leaveHistory: [] };
     }
 
-    const { data, error } = await locals.supabase
-            .from('filed_leave')
-            .select(`*, 
-                hr_info: employees!hr_uuid( employee_name ), 
-                leave_name: types_of_leave!type_of_leave( name ),
-                employee_info: employees!employee_uuid( employee_name, position, employee_id, email, profile_pic_url, uuid,
-                    department_info: departments!department(name) )`
-            )
-            .in('status', ['Approve', 'Decline'])
-            .eq('employee_uuid', employee.uuid)
-            .order('date_filed', { ascending: false })
+    const [
+        { data, error },
+        { data: dept_head}
+    ] = await Promise.all([
+            locals.supabase
+                .from('filed_leave')
+                .select(`*, 
+                    hr_info: employees!hr_uuid( employee_name ), 
+                    leave_name: types_of_leave!type_of_leave( name ),
+                    employee_info: employees!employee_uuid( employee_name, position, employee_id, email, profile_pic_url, uuid,
+                        department_info: departments!department(name) )`
+                )
+                .in('status', ['Approve', 'Decline'])
+                .eq('employee_uuid', employee.uuid)
+                .order('date_filed', { ascending: false }),
+            locals.supabase
+                .from('departments')
+                .select('info: employees!dept_head( employee_name )')
+                .eq('uuid', employee.department_uuid)
+                .single()
+        ])
     
         
         let leaveHistory: LeaveHistory[] = []
@@ -50,7 +60,8 @@ export const load = (async ({locals, parent}) => {
                 status: i?.status,
                 processed_at: i?.processed_at,
                 decline_reason: i?.decline_reason,
-                leave_points_snapshot: i?.leave_points_snapshot
+                leave_points_snapshot: i?.leave_points_snapshot,
+                dept_head_name: dept_head?.info?.employee_name ?? ''
             })) 
             }
 

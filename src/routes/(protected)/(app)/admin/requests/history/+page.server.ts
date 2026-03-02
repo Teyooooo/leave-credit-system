@@ -1,9 +1,14 @@
-import type { LeaveHistory } from '$lib/types/data';
+import type { Department, LeaveHistory } from '$lib/types/data';
 import { convertCalendarDate, getTotalDays } from '$lib/utils/helper';
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({locals}) => {
-    const { data, error } = await locals.supabase
+
+    const [
+        {data: leave_histories, error: leave_histories_error},
+        {data: departments}
+    ] = await Promise.all([
+        locals.supabase
             .from('filed_leave')
             .select(`*, 
                 hr: employees!hr_uuid( employee_name ), 
@@ -13,14 +18,30 @@ export const load = (async ({locals}) => {
                  )`
             )
             .in('status', ['Approve', 'Decline'])
-            .order('date_filed', { ascending: false })
-    
-        
-        let leaveHistory: LeaveHistory[] = []
-          if(!error){
-            console.log({data})
+            .order('date_filed', { ascending: false }),
+        locals.supabase
+            .from('departments')
+            .select(`*, 
+                head_info: employees!dept_head( employee_name )
+                `)
+    ])
 
-            leaveHistory = data?.map( i => ({
+
+        const listOfDepartments: Department[] = departments?.map(i => ({
+            uuid: i?.uuid,
+            name: i?.name,
+            created_at: i?.created_at,
+            head_uuid: i?.dept_head,
+            head_name: i?.head_info?.employee_name
+        })) || []
+
+
+    
+        let leaveHistory: LeaveHistory[] = []
+          if(!leave_histories_error){
+            console.log({leave_histories}) 
+
+            leaveHistory = leave_histories?.map( i => ({
                 employee_uuid: i?.employee_info?.uuid,
                 employee_name: i?.employee_info?.employee_name,
                 employee_id: i?.employee_info?.employee_id,
@@ -43,7 +64,8 @@ export const load = (async ({locals}) => {
                 status: i?.status,
                 processed_at: i?.processed_at,
                 decline_reason: i?.decline_reason,
-                leave_points_snapshot: i?.leave_points_snapshot
+                leave_points_snapshot: i?.leave_points_snapshot,
+                dept_head_name: listOfDepartments.find(dept => dept.name === i?.employee_info?.department_info?.name )?.head_name ?? ''
             }))
             }
 

@@ -41,10 +41,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             "contactNumber": data.contact_number,
             "reasonForLeave": data.reason,
             "fullNameCapital": String(data.employee_name).toUpperCase(),
+            "deptHeadFullNameCapital": String(data.dept_head_name).toLocaleUpperCase(),
             "hrFullNameCapital": String(data.hr_name).toUpperCase(),
         });
 
-        //Generate as blob
+        //Generate as blobs
         const blob = doc.getZip().generate({
         type: 'blob',
         mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

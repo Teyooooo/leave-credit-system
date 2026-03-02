@@ -14,6 +14,9 @@
     let { data }: PageProps = $props();
     let { leaveHistory } = $derived(data)
 
+	// svelte-ignore state_referenced_locally
+	console.log({leaveHistory})
+
 
 </script>
 

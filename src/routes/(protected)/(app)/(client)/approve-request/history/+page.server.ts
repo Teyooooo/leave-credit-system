@@ -61,7 +61,8 @@ export const load = (async ({locals, parent}) => {
                 status: i?.status,
                 processed_at: i?.processed_at,
                 decline_reason: i?.decline_reason,
-                leave_points_snapshot: i?.leave_points_snapshot
+                leave_points_snapshot: i?.leave_points_snapshot,
+                dept_head_name: employee.name
             }))
             }
 

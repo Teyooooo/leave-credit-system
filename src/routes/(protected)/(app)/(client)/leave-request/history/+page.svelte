@@ -11,6 +11,7 @@
     ];
     let { data }: PageProps = $props();
     let { leaveHistory } = $derived(data)
+    
 
 </script>
 

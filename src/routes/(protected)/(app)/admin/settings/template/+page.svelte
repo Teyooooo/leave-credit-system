@@ -90,6 +90,11 @@
     "description": "Printed name for employee signature"
   },
   {
+    "name": "Department Head Name (Capitalized)",
+    "placeholder": "{deptHeadFullNameCapital}",
+    "description": "Printed name for department head signature"
+  },
+  {
     "name": "HR / Manager Name (Capitalized)",
     "placeholder": "{hrFullNameCapital}",
     "description": "Printed name for HR or manager approval"

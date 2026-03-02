@@ -131,6 +131,7 @@ export interface LeaveHistory extends AdminFiledLeaveInfo {
     processed_at: string;
     decline_reason: string;
     leave_points_snapshot: string;
+    dept_head_name: string;
 }
 
 export interface AdminDashboardInfo {
