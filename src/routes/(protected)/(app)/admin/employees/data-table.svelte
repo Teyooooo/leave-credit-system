@@ -138,7 +138,7 @@
 						<Select.Label>Departments</Select.Label>
 						<Select.Item value="all" label="All Departments">All Departments</Select.Item>
 						{#each $departments as department}
-							<Select.Item value={department.uuid}>
+							<Select.Item value={department.name}>
 								{department.name}
 							</Select.Item>
 						{/each}
