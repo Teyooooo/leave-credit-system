@@ -10,13 +10,16 @@ export const load = (async ({locals}) => {
         if ( error ){
             return { employees: []}
         }
+
+        const activeAccounts = data.filter( i => i.is_account_active)
     
-        const employees: EmployeeDataAdmin[] = data.map( item => ({
+        const employees: EmployeeDataAdmin[] = activeAccounts.map( item => ({
             uuid: item.uuid as string || "",
             profile_pic: item.profile_pic_url as string || "",
             employee_id: item.employee_id as number,
             name: item.employee_name as string,
             email: item.email as string,
+            department_uuid: item.department,
             department: item.department_info?.name as string ?? "-",
             position: item.position as string ?? "-",
             created_at: item.created_at as string,

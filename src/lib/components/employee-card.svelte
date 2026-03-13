@@ -13,11 +13,15 @@
 
 	let { employee, creditPoints } = $props();
 
+	let vacation_leave_points = $state(1.25)
+	let sick_leave_points = $state(1.25)
+	let balance_brought_forward = $state<number>()
 
 	let dialogStates = $state(false);
 	let submitStates = $state(false);
 	let errorStates = $state<string | undefined>();
 
+	let confirmDialogStates = $state(false);
 </script>
 
 <div class="w-full border bg-inherit">
@@ -78,27 +82,27 @@
 						id="add_credits"
 						method="POST"
 						use:enhance={({ formData }) => {
-							submitStates = true
+							submitStates = true;
 							formData.append('uuid', employee.uuid);
-							formData.append('sick_leave_balance', creditPoints?.sick_leave_points ?? 0)
-							formData.append('vacation_leave_balance', creditPoints?.vacation_leave_points ?? 0)
+							formData.append('sick_leave_balance', creditPoints?.sick_leave_points ?? 0);
+							formData.append('vacation_leave_balance', creditPoints?.vacation_leave_points ?? 0);
 
 							return async ({ result, update }) => {
 								console.log(result);
-								submitStates = false
+								submitStates = false;
 
-								if(result.type === 'failure'){
+								if (result.type === 'failure') {
 									const data = result.data as { message?: string };
-									errorStates = data?.message || 'Something went wrong'
+									errorStates = data?.message || 'Something went wrong';
 								}
 
-								if(result.type === 'success'){
-									dialogStates = false
-									errorStates = undefined
-									toast.success('Monthly points issue added successfully')
+								if (result.type === 'success') {
+									dialogStates = false;
+									errorStates = undefined;
+									toast.success('Monthly points issue added successfully');
 								}
 
-								await update()
+								await update();
 							};
 						}}
 					>
@@ -114,7 +118,7 @@
 									form="add_credits"
 									type="number"
 									step="0.01"
-									value="1.25"
+									bind:value={vacation_leave_points}
 									required
 								/>
 							</div>
@@ -126,7 +130,7 @@
 									form="add_credits"
 									type="number"
 									step="0.01"
-									value="1.25"
+									bind:value={sick_leave_points}
 									required
 								/>
 							</div>
@@ -137,6 +141,7 @@
 									name="balance_brought_forward"
 									form="add_credits"
 									type="number"
+									bind:value={balance_brought_forward}
 								/>
 							</div>
 							<!-- <div class="grid gap-3">
@@ -153,15 +158,11 @@
 							{/if}
 							<Dialog.Footer>
 								<Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
-								<Button
-									type="submit"
-									form="add_credits"
-									disabled={submitStates}
-								>
+								<Button onclick={() => (confirmDialogStates = true)} disabled={submitStates}>
 									{#if submitStates}
 										<Spinner />
 									{/if}
-									Update
+									Add
 								</Button>
 							</Dialog.Footer>
 						</Dialog.Content>
@@ -172,3 +173,32 @@
 	</div>
 	<EmployeeCreditsCard {creditPoints} />
 </div>
+
+<Dialog.Root
+	bind:open={confirmDialogStates}
+	onOpenChange={(open) => {
+		confirmDialogStates = open;
+	}}
+>
+	<Dialog.Content>
+		<Dialog.Header>
+			<Dialog.Title>Confirm Adding Leave Credits</Dialog.Title>
+			<Dialog.Description>
+				<p>You are about to add:</p>
+				<ul class="list-disc ms-10 mt-3">
+					<li>Vacation Leave: {vacation_leave_points}</li>
+					<li>Sick Leave: {sick_leave_points}</li>
+					<li>Balance Brought Forward: {balance_brought_forward ? balance_brought_forward : 0} {balance_brought_forward ? (balance_brought_forward > 1 ? 'minutes' : 'minute') : 'minute' }</li>
+				</ul>
+				<p class="mt-3">Do you want to continue?</p>
+			</Dialog.Description>
+
+		</Dialog.Header>
+		<Dialog.Footer>
+			<Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
+			<Button type="submit" form="add_credits" onclick={() => (confirmDialogStates = false)}>
+				Proceed
+			</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>

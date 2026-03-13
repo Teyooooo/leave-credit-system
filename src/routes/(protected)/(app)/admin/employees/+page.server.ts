@@ -96,10 +96,20 @@ export const actions: Actions = {
             .eq('uuid', uuid)
 
         if(error){
-            return fail(500, {
-                error: true,
-                message: 'Failed to delete employee info. Please try again later.'
+
+            const { error: errorUpdate } = await locals.supabase
+            .from('employees')
+            .update({
+                is_account_active: false
             })
+            .eq('uuid', uuid)
+
+            if(errorUpdate){       
+                return fail(500, {
+                    error: true,
+                    message: 'Failed to delete employee info. Please try again later.'
+                })
+            }
         }
         
         await locals.logActivity(`Deleting employee "${name}" (ID: ${id})`)
