@@ -7,6 +7,7 @@ export const load = (async ({locals}) => {
     const { count: totalEmployees, error: totalEmployeesError } = await locals.supabase
         .from('employees')
         .select('*', { count: 'exact', head: true })
+        .eq('is_account_active', true)
 
     let employees  = 0
     if(!totalEmployeesError){
@@ -44,7 +45,7 @@ export const load = (async ({locals}) => {
     // Getting the 10 lowest leave points
     let { data: creditPoints, error: creditPointsError } = await locals.supabase
     .from('credit_points')
-    .select('*, employee_info: employees!employee_uuid(employee_id, employee_name, profile_pic_url, email)')
+    .select('*, employee_info: employees!employee_uuid(employee_id, employee_name, profile_pic_url, email, is_account_active)')
     .order('vacation_leave_points', { ascending: true })
     .order('sick_leave_points', { ascending: true })
     .limit(10)
@@ -52,9 +53,9 @@ export const load = (async ({locals}) => {
     let lowPoints: LowLevelBalance[] = []
     if(!creditPointsError){
         
-        creditPoints?.forEach(i => console.log({i}) )
+        const filteredCreditPoints = creditPoints?.filter((i)=> i?.employee_info.is_account_active === true)
 
-        lowPoints = creditPoints?.map(i => ({
+        lowPoints = filteredCreditPoints?.map(i => ({
             name: i?.employee_info?.employee_name ?? '-',
             employee_id: i?.employee_info?.employee_id ?? '-',
             email: i?.employee_info?.email ?? '-',
