@@ -6,13 +6,13 @@
 	import type { LoginFormResult } from '$lib/types/auth';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+	import { getFlash } from 'sveltekit-flash-message';
+
+	const flash = getFlash(page);
 
 	onMount(() => {
-		const error = page.url.searchParams.get('error');
-		if (error === 'account_deleted') {
-			toast.error('Your account is deleted. Please contact HR for assistance.');
-		}else if (error === 'account_not_found'){
-			toast.error('Account not found. Please contact HR for assistance.');
+		if ($flash?.type === 'error') {
+			toast.error($flash.message);
 		}
 	});
 

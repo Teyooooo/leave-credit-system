@@ -1,6 +1,8 @@
-import type { LayoutServerLoad } from './$types'
+import { loadFlash } from 'sveltekit-flash-message/server';
+import type { LayoutServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies }) => {
+export const load: LayoutServerLoad = loadFlash(async (event) => {
+  const { locals: { safeGetSession }, cookies } = event;
   const { session, user } = await safeGetSession()
 
   return {
@@ -8,4 +10,4 @@ export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cooki
     user,
     cookies: cookies.getAll(),
   }
-}
+});

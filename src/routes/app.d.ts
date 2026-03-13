@@ -12,7 +12,8 @@ declare global {
       logActivity: (details:string) => Promise<void> 
     }
     interface PageData {
-      session: Session | null
+      session: Session | null;
+      flash?: { type: 'success' | 'error'; message: string };
     }
     // interface PageState {}
     // interface Platform {}

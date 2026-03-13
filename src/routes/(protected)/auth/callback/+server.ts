@@ -1,7 +1,10 @@
-import { redirect } from '@sveltejs/kit'
-import type { RequestHandler } from './$types'
+import { redirect } from '@sveltejs/kit';
+import { redirect as redirectFlash } from 'sveltekit-flash-message/server';
+import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
+export const GET: RequestHandler = async (event) => {
+    const { url, locals: { supabase }, cookies } = event; 
+    
     const code = url.searchParams.get('code')
     const next = url.searchParams.get('next') ?? '/input-id'
 
@@ -19,12 +22,13 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 
         if (employeeError || !employee) {
             await supabase.auth.signOut();
-            throw redirect(303, "/login?error=account_not_found");
+            throw redirectFlash('/login', { type:'error', message:'Account not found. Please contact HR for assistance.' }, event)
+
         }
 
         if(!employee?.is_account_active){
             await supabase.auth.signOut();
-            throw redirect(303, "/login?error=account_deleted");
+            throw redirectFlash('/login', { type:'error', message:'Your account is deleted. Please contact HR for assistance.' }, event)
         }
 
         if (!error && data.session) {
