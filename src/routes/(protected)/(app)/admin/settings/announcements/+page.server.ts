@@ -1,18 +1,28 @@
 import type { AnnouncementInfo } from '$lib/types/data';
+import type { BulkRecipient } from '$lib/utils/emailHelper';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async ({locals}) => {
-    const { data, error } = await locals.supabase
+
+    const [
+        { data: announcementsData, error: announcementsError },
+        { data: employeesData, error: employeesError }
+    ] = await Promise.all([
+        locals.supabase
         .from('announcement')
         .select()
-        .order('created_at', {ascending: false})
-
-    if(error){
+        .order('created_at', {ascending: false}),
+        locals.supabase
+        .from('employees')
+        .select(`employee_name, email, is_account_active`)
+    ])
+    
+    if(announcementsError || employeesError){
         return { errorMessage: 'Failed to fetch data to server.'}
     }   
-
-    const announcements: AnnouncementInfo[] = data?.map((i)=>({
+    
+    const announcements: AnnouncementInfo[] = announcementsData?.map((i)=>({
         uuid: i.uuid,
         created_at: i.created_at,
         title: i.title,
@@ -21,8 +31,14 @@ export const load = (async ({locals}) => {
         valid_until_end: i.valid_until_end,
         type: 'all'
     }))
+    
+    const activeAccounts = employeesData.filter( i => i.is_account_active)
+    const employeeEmails: BulkRecipient[] = activeAccounts?.map((i)=>({
+        name : i.employee_name,
+        email : i.email
+    }))
 
-    return { announcements };
+    return { announcements, employeeEmails };
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {

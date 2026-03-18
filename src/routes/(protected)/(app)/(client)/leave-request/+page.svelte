@@ -17,15 +17,17 @@
 	import { Form } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 	import type { PageProps } from './$types';
-	
+
 	let { data }: PageProps = $props();
 	const { employee, listsOfLeave, creditInfo, allFiledLeave } = $derived(data);
 
 	$web_path_header = [{ path_name: 'Leave Request', route: '/leave-request' }];
-	$effect(()=>{
-		$user_points = {vacation: creditInfo?.vacation_leave_points ?? 0, sick: creditInfo?.sick_leave_points ?? 0}
-	})
-
+	$effect(() => {
+		$user_points = {
+			vacation: creditInfo?.vacation_leave_points ?? 0,
+			sick: creditInfo?.sick_leave_points ?? 0
+		};
+	});
 
 	// for the form
 	let dialogState = $state(false);
@@ -44,33 +46,31 @@
 	// Check if date range is complete
 	let isDateRangeValid = $derived(date_range.start && date_range.end);
 
-	
 	let totalDays = $state(0);
 	$effect(() => {
 		totalDays = getTotalDays(date_range.start, date_range.end);
 	});
-	
+
 	// type of leave
 	let leave_selected = $state('');
 	const triggerContent = $derived(
 		listsOfLeave?.find((f) => f?.uuid === leave_selected)?.name ?? 'Select a Leave'
 	);
-	
-    // Check if totalDays is sufficient with its leave points
-    let isInsufficient = $derived(
-        (triggerContent.toLocaleLowerCase() === 'sick leave' &&
-        (creditInfo?.sick_leave_points ?? 0) < totalDays) ||
-        (triggerContent.toLocaleLowerCase() === 'vacation leave' &&
-        (creditInfo?.vacation_leave_points ?? 0) < totalDays))
+
+	// Check if totalDays is sufficient with its leave points
+	let isInsufficient = $derived(
+		(triggerContent.toLocaleLowerCase() === 'sick leave' &&
+			(creditInfo?.sick_leave_points ?? 0) < totalDays) ||
+			(triggerContent.toLocaleLowerCase() === 'vacation leave' &&
+				(creditInfo?.vacation_leave_points ?? 0) < totalDays)
+	);
 
 	// for the contact number
-	let contact_number = $state('')
+	let contact_number = $state('');
 	$effect(() => {
-		contact_number = contact_number
-			.replace(/\D/g, '')
-			.slice(0, 11);
+		contact_number = contact_number.replace(/\D/g, '').slice(0, 11);
 
-		console.log({allFiledLeave})
+		console.log({ allFiledLeave });
 	});
 </script>
 
@@ -99,13 +99,15 @@
 				}
 			}}
 		>
-			<Dialog.Trigger class={[buttonVariants(), 'mt-3 justify-start!']}><Form /> File a Leave</Dialog.Trigger>
+			<Dialog.Trigger class={[buttonVariants(), 'mt-3 justify-start!']}
+				><Form /> File a Leave</Dialog.Trigger
+			>
 			<form
 				action="?/file_leave"
 				method="post"
 				id="file_leave_form"
 				use:enhance={({ formData }) => {
-					 // Validate date range before submission
+					// Validate date range before submission
 					if (!date_range.start || !date_range.end) {
 						errorState = 'Please select both start and end dates';
 						return async ({ update }) => {
@@ -113,8 +115,8 @@
 						};
 					}
 
-					submitState = true
-					dialogState = true
+					submitState = true;
+					dialogState = true;
 
 					// Convert dates to ISO strings
 					const startDate = date_range.start.toDate(getLocalTimeZone()).toISOString();
@@ -125,11 +127,10 @@
 					formData.append('employee_uuid', employee.uuid);
 					formData.append('type_of_leave', leave_selected);
 
-
 					return async ({ result, update }) => {
 						submitState = false;
 
-						if(result.type === 'failure'){
+						if (result.type === 'failure') {
 							const data = result.data as { message?: string };
 							errorState = data?.message || 'An error occurred';
 						}
@@ -137,14 +138,14 @@
 						if (result.type === 'success') {
 							dialogState = false;
 							errorState = undefined;
-							toast.success("Filing Leave successfully")
+							toast.success('Filing Leave successfully');
 						}
 
 						await update();
 					};
 				}}
 			>
-				<Dialog.Content class="w-sm max-h-[80vh] overflow-y-auto">
+				<Dialog.Content class="max-h-[80vh] w-sm overflow-y-auto">
 					<Dialog.Header>
 						<Dialog.Title>File a Leave</Dialog.Title>
 					</Dialog.Header>
@@ -164,7 +165,7 @@
 											disabled={(leave.name.toLocaleLowerCase() === 'sick leave' &&
 												(creditInfo?.sick_leave_points ?? 0) < 1) ||
 												(leave.name.toLocaleLowerCase() === 'vacation leave' &&
-												(creditInfo?.vacation_leave_points ?? 0) < 1)}
+													(creditInfo?.vacation_leave_points ?? 0) < 1)}
 										>
 											{leave.name}
 										</Select.Item>
@@ -174,29 +175,30 @@
 						</Select.Root>
 					</div>
 
-					{#if isInsufficient}
-						<p class="text-sm text-red-600">Insufficient {triggerContent} points.</p>
-					{/if}
-
 					<div class="grid gap-3">
 						<div class="flex justify-between">
 							<Label for="entitlement">Inclusive Date</Label>
 							<p class="text-sm">Total Days: {totalDays}</p>
 						</div>
 						<div class="grid gap-2">
-							<RangeCalendar bind:value={date_range} class="rounded-lg border w-fit" />
+							<RangeCalendar bind:value={date_range} class="w-fit rounded-lg border" />
 
+							{#if isInsufficient}
+								<p class="text-sm text-red-600">Insufficient {triggerContent} points.</p>
+							{/if}
 							{#if !isDateRangeValid}
-								<p class="text-sm text-red-600">Please select both start and end dates. To announce for a single day, click the same date twice or double-click it.</p>
+								<p class="text-sm text-red-600">
+									Please select both start and end dates. To announce for a single day, click the
+									same date twice or double-click it.
+								</p>
 							{/if}
 						</div>
-						
 					</div>
 					<div class="grid gap-3">
 						<Label for="contact_number">Contact Number</Label>
 						<Input
 							type="text"
-  							inputmode="numeric"
+							inputmode="numeric"
 							id="contact_number"
 							name="contact_number"
 							form="file_leave_form"
@@ -206,14 +208,18 @@
 					</div>
 					<div class="grid gap-3">
 						<Label for="reason">Reason</Label>
-						<Textarea id="reason" name="reason" form="file_leave_form" required/>
+						<Textarea id="reason" name="reason" form="file_leave_form" required />
 					</div>
 					{#if errorState}
 						<p class="text-sm text-red-600">{errorState}</p>
 					{/if}
 					<Dialog.Footer>
 						<Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
-						<Button type="submit" form="file_leave_form" disabled={submitState || !isDateRangeValid || isInsufficient}>
+						<Button
+							type="submit"
+							form="file_leave_form"
+							disabled={submitState || !isDateRangeValid || isInsufficient}
+						>
 							{#if submitState}
 								<Spinner />
 							{/if}
@@ -226,8 +232,6 @@
 	</div>
 </div>
 
-<div class="mx-6 min-h-96 w-[100%-1.5rem] grid gap-4">
+<div class="mx-6 grid min-h-96 w-[100%-1.5rem] gap-4">
 	<FiledLeavePendingContainer filedLeave={allFiledLeave} {employee} {listsOfLeave} />
 </div>
-
-

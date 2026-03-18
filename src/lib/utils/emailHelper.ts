@@ -1,6 +1,17 @@
 import { GMAIL_APP_PASSWORD, GMAIL_USER } from '$env/static/private';
 import nodemailer from 'nodemailer';
 
+export interface BulkRecipient {
+  email: string;
+  name?: string;
+}
+
+export interface BulkSendResult {
+  email: string;
+  success: boolean;
+  error?: string;
+}
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
@@ -17,6 +28,38 @@ export async function sendLeaveEmail(
     subject: `Leave Credit System - Leave Request ${status === 'approved' ? 'Approved' : 'Declined'}`,
     html,
   });
+}
+
+export async function sendBulkEmail(
+  recipients: BulkRecipient[],
+  subject: string,
+  htmlFn: (recipient: BulkRecipient) => string,
+  delayMs: number = 1500
+): Promise<BulkSendResult[]> {
+  const results: BulkSendResult[] = [];
+
+  for (const recipient of recipients) {
+    try {
+      await transporter.sendMail({
+        from: 'Leave Credit System',
+        to: recipient.email,
+        subject,
+        html: htmlFn(recipient),
+      });
+
+      results.push({ email: recipient.email, success: true });
+      await new Promise((res) => setTimeout(res, delayMs));
+
+    } catch (err: unknown) {
+      results.push({
+        email: recipient.email,
+        success: false,
+        error: err instanceof Error ? err.message : 'Unknown error',
+      });
+    }
+  }
+
+  return results;
 }
 
 export function leaveApprovedTemplate(
@@ -214,4 +257,76 @@ export function leaveDeclinedTemplate(
     </tr>
   </table>
   `;
+}
+
+
+export function announcementTemplate(
+  title: string,
+  description: string,
+  validUntil: string
+){
+  return `
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f8;">
+  <tr>
+    <td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%;background-color:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+
+        <!-- Top Accent -->
+        <tr>
+          <td style="background-color:#2563eb;padding:6px 0;"></td>
+        </tr>
+
+        <!-- Header -->
+        <tr>
+          <td style="padding:40px 40px 24px;text-align:center;">
+            <p style="margin:0;font-size:28px;font-weight:bold;margin-bottom:15px;">
+              Leave Credit System
+            </p>
+
+            <div style="display:inline-block;width:56px;height:56px;background-color:#dbeafe;border-radius:50%;line-height:56px;font-size:26px;margin-bottom:16px;">
+              📢
+            </div>
+
+            <!-- TITLE -->
+            <h2 style="margin:0 0 10px;font-size:22px;font-weight:700;color:#111827;">
+              ${title}
+            </h2>
+          </td>
+        </tr>
+
+        <!-- Divider -->
+        <tr>
+          <td style="padding:0 40px;">
+            <div style="border-top:1px solid #f0f0f0;"></div>
+          </td>
+        </tr>
+
+        <!-- Description -->
+        <tr>
+          <td style="padding:24px 40px;text-align:center;">
+            <p style="margin:0 0 16px;font-size:14px;color:#6b7280;line-height:1.6;">
+              ${description}
+            </p>
+
+            <!-- Valid Until -->
+            <p style="margin:0;font-size:13px;color:#9ca3af;">
+              Valid until: <strong style="color:#374151;">${validUntil}</strong>
+            </p>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background-color:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #f0f0f0;">
+            <p style="margin:0;font-size:12px;color:#9ca3af;">
+              This is an automated announcement from Leave Credit System.
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+  `
 }
