@@ -61,7 +61,7 @@
 		<div>
 			<div class="grid gap-2 py-3">
 				<p class="font-light">Created at</p>
-				<p class="font-semibold">{convertTimestamp(employee.created_at)}</p>
+				<p class="font-semibold">{convertTimestamp(employee.created_at, 'full')}</p>
 			</div>
 			<div class="grid gap-2 py-3">
 				<p class="font-light">System Role</p>

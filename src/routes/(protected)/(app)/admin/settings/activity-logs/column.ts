@@ -3,6 +3,7 @@ import DataTableTimestampButton from "$lib/components/data-table/data-table-time
 import EmployeeNameCell from "$lib/components/data-table/employee-name-cell.svelte";
 import { renderComponent } from "$lib/components/ui/data-table";
 import type { ActivityLogsAdmin } from "$lib/types/data";
+import { convertTimestamp } from "$lib/utils/helper";
 import type { ColumnDef } from "@tanstack/table-core";
 
 
@@ -15,30 +16,24 @@ export const columns: ColumnDef<ActivityLogsAdmin>[] = [
                 column: column, // Add this
             }),
         cell: ({ getValue }) => {
-            const date = new Date(getValue<string>());
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            return convertTimestamp(getValue<string>(), "full");
+            ;
         }
     },
     {
-            accessorKey: "name",
-            header: ({ column }) =>
-                renderComponent(DataTableNameButton, {
-                    onclick: column.getToggleSortingHandler(),
-                    column: column, // Add this
-                }),
-            cell: ({ row }) => {
-                return renderComponent(EmployeeNameCell, {
-                    name: row.original.name,
-                    profile_pic: row.original.profile_pic,
-                });
-            },
+        accessorKey: "name",
+        header: ({ column }) =>
+            renderComponent(DataTableNameButton, {
+                onclick: column.getToggleSortingHandler(),
+                column: column, // Add this
+            }),
+        cell: ({ row }) => {
+            return renderComponent(EmployeeNameCell, {
+                name: row.original.name,
+                profile_pic: row.original.profile_pic,
+            });
         },
+    },
     {
         accessorKey: "details",
         header: "Details",

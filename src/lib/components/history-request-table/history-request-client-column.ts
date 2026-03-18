@@ -43,7 +43,7 @@ export const columns: ColumnDef<LeaveHistory>[] = [
         accessorKey: "processed_at",
         header: "Processed At",
         cell: ({row}) => {
-            return `${convertTimestamp(row.original.processed_at, 'numericDate')}`
+            return `${convertTimestamp(row.original.processed_at, 'numericFull')}`
         },
     }
     ,

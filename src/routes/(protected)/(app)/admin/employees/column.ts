@@ -8,6 +8,7 @@ import DataTableVerifiedButton from "$lib/components/data-table/data-table-verif
 import EmployeeNameCell from "$lib/components/data-table/employee-name-cell.svelte";
 import { renderComponent } from "$lib/components/ui/data-table";
 import type { EmployeeDataAdmin } from "$lib/types/data";
+import { convertTimestamp } from "$lib/utils/helper";
 import type { ColumnDef } from "@tanstack/table-core";
 import DataTableActions from "./data-table-actions.svelte";
 
@@ -30,65 +31,59 @@ export const columns: ColumnDef<EmployeeDataAdmin>[] = [
     {
         accessorKey: "email",
         header: ({ column }) =>
-        renderComponent(DataTableEmailButton, {
-            onclick: column.getToggleSortingHandler(),
-            column: column, // Add this
-        }),
+            renderComponent(DataTableEmailButton, {
+                onclick: column.getToggleSortingHandler(),
+                column: column, // Add this
+            }),
     },
     {
         accessorKey: "employee_id",
         header: ({ column }) =>
-        renderComponent(DataTableIdButton, {
-            onclick: column.getToggleSortingHandler(),
-            column: column, // Add this
-        }),
+            renderComponent(DataTableIdButton, {
+                onclick: column.getToggleSortingHandler(),
+                column: column, // Add this
+            }),
     },
     {
         accessorKey: "department",
         header: ({ column }) =>
-        renderComponent(DataTableDepartmentButton, {
-            onclick: column.getToggleSortingHandler(),
-            column: column, // Add this
-        }),
+            renderComponent(DataTableDepartmentButton, {
+                onclick: column.getToggleSortingHandler(),
+                column: column, // Add this
+            }),
     },
     {
         accessorKey: "position",
         header: ({ column }) =>
-        renderComponent(DataTablePositionButton, {
-            onclick: column.getToggleSortingHandler(),
-            column: column, // Add this
-        }),
+            renderComponent(DataTablePositionButton, {
+                onclick: column.getToggleSortingHandler(),
+                column: column, // Add this
+            }),
     },
     {
         accessorKey: "created_at",
         header: ({ column }) =>
-        renderComponent(DataTableCreatedAtButton, {
-            onclick: column.getToggleSortingHandler(),
-            column: column, // Add this
-        }),
+            renderComponent(DataTableCreatedAtButton, {
+                onclick: column.getToggleSortingHandler(),
+                column: column, // Add this
+            }),
         cell: ({ getValue }) => {
-            const date = new Date(getValue<string>());
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            return convertTimestamp(getValue<string>(), "full");
+            ;
         }
     },
     {
         accessorKey: "is_account_verified",
         header: ({ column }) =>
-        renderComponent(DataTableVerifiedButton, {
-            onclick: column.getToggleSortingHandler(),
-            column: column, // Add this
-        }),
+            renderComponent(DataTableVerifiedButton, {
+                onclick: column.getToggleSortingHandler(),
+                column: column, // Add this
+            }),
         cell: ({ getValue }) => (getValue<boolean>() ? "Yes" : "No"),
     },
     {
-      accessorKey: "role_in_system",
-      header: "Role"  
+        accessorKey: "role_in_system",
+        header: "Role"
     },
     {
         id: "actions",
