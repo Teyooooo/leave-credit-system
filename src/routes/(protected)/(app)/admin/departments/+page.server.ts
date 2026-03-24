@@ -13,7 +13,8 @@ export const load = (async ({locals}) => {
             .select('*, head_info: employees!dept_head( employee_name )'),
         locals.supabase
             .from('employees')
-            .select('*'),
+            .select('*')
+            .eq('is_account_active', true),
     ])
 
     let listOfDepartments: Department[] = [] 
