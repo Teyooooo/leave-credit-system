@@ -17,15 +17,15 @@
 
 	let actionDropdownState = $state(false);
 	let editDialogStates = $state(false);
-	let deleteDialogStates = $state(false);
+	let deactivateDialogStates = $state(false);
 	let updateRoleDialogStates = $state(false);
 
 	let editSubmitStates = $state(false);
-	let deleteSubmitStates = $state(false);
+	let deactivateSubmitStates = $state(false);
 	let updateRoleSubmitStates = $state(false);
 
 	let editErrorStates = $state<string | undefined>();
-	let deleteErrorStates = $state<string | undefined>();
+	let deactivateErrorStates = $state<string | undefined>();
 	let updateRoleErrorStates = $state<string | undefined>();
 
 
@@ -107,10 +107,10 @@
 				onSelect={(e) => {
 					e.preventDefault();
 					actionDropdownState = false;
-					deleteDialogStates = true;
+					deactivateDialogStates = true;
 				}}
 			>
-				Delete
+				Deactivate
 			</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
@@ -231,51 +231,52 @@
 
 <!-- Delete Dialog-Form -->
 <Dialog.Root
-	open={deleteDialogStates}
+	open={deactivateDialogStates}
 	onOpenChange={(open) => {
-		deleteDialogStates = open;
+		deactivateDialogStates = open;
 
         if(!open){
-            deleteErrorStates = undefined;
+            deactivateErrorStates = undefined;
         }
 	}}
 >
 	<Dialog.Content>
 		<Dialog.Header>
-			<Dialog.Title>Deleting Employee ({data.name})</Dialog.Title>
+			<Dialog.Title>Deactivating Employee ({data.name})</Dialog.Title>
 			<Dialog.Description>
-				This action cannot be undone. This will permanently delete this account and remove this data
-				from our servers.
+				This will deactivate the account and prevent the user from signing in. You can reactivate it at any time.
 			</Dialog.Description>
 		</Dialog.Header>
-		{#if deleteErrorStates}
-			<p class="text-sm text-red-600">{deleteErrorStates}</p>
+		{#if deactivateErrorStates}
+			<p class="text-sm text-red-600">{deactivateErrorStates}</p>
 		{/if}
 		<Dialog.Footer>
 			<Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
 			<form
-				action="?/delete_employee"
+				action="?/deactivate_employee"
 				method="post"
-				id="delete_employee"
+				id="deactivate_employee"
 				use:enhance={({ formData }) => {
-					deleteSubmitStates = true;
+					deactivateSubmitStates = true;
 					formData.append('uuid', data.uuid);
 					formData.append('employee_name', data.name);
 					formData.append('employee_id', String(data.employee_id));
+					formData.append('position', data.position)
+					formData.append('department_uuid', data.department_uuid)
 
 					return async ({ result, update }) => {
-						deleteSubmitStates = false;
+						deactivateSubmitStates = false;
 						console.log({ result });
 
 						if (result.type === 'failure') {
 							const data = result.data as { message?: string };
-							deleteErrorStates = data?.message || 'An error occurred';
+							deactivateErrorStates = data?.message || 'An error occurred';
 						}
 
 						if (result.type === 'success') {
-							deleteDialogStates = false;
-							deleteErrorStates = undefined;
-							toast.success(`Employee "${formName}" deleted successfully`)
+							deactivateDialogStates = false;
+							deactivateErrorStates = undefined;
+							toast.success(`Employee "${formName}" deactivate successfully`)
 						}
 
 						await update();
@@ -285,12 +286,12 @@
 				<Button
 					type="submit"
 					variant="destructive"
-					form="delete_employee"
-					disabled={deleteSubmitStates}
+					form="deactivate_employee"
+					disabled={deactivateSubmitStates}
 				>
-					{#if deleteSubmitStates}
+					{#if deactivateSubmitStates}
 						<Spinner />
-					{/if}Delete
+					{/if}Deactivate
 				</Button>
 			</form>
 		</Dialog.Footer>

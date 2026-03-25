@@ -28,7 +28,7 @@ export const GET: RequestHandler = async (event) => {
 
         if(!employee?.is_account_active){
             await supabase.auth.signOut();
-            throw redirectFlash('/login', { type:'error', message:'Your account is deleted. Please contact HR for assistance.' }, event)
+            throw redirectFlash('/login', { type:'error', message:'Your account is inactive. Please contact HR for assistance.' }, event)
         }
 
         if (!error && data.session) {

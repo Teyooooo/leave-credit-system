@@ -2,15 +2,15 @@ import type { Department } from '$lib/types/data';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async ({locals}) => {
-    
+export const load = (async ({ locals }) => {
+
     let { data: departments, error } = await locals.supabase
-    .from('departments')
-    .select('*, head_info: employees!dept_head( employee_name )')
+        .from('departments')
+        .select('*, head_info: employees!dept_head( employee_name )')
 
     let listOfDepartments: Department[] = []
-    if(!error){
-        console.log({departments})
+    if (!error) {
+        console.log({ departments })
         listOfDepartments = departments?.map(i => ({
             uuid: i?.uuid,
             name: i?.name,
@@ -19,12 +19,12 @@ export const load = (async ({locals}) => {
             head_name: i?.head_info?.employee_name
         })) || []
     }
-          
-    return{ listOfDepartments }
+
+    return { listOfDepartments }
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-    add_employee : async ({request, locals}) => {
+    add_employee: async ({ request, locals }) => {
         const formData = await request.formData()
 
         const name = formData.get('name') as string
@@ -45,14 +45,14 @@ export const actions: Actions = {
                 role_in_system: 'Client'
             })
 
-        if ( error ){
-            return fail(500, {error: true, message: 'Failed to add new employee. Please try again.'})
+        if (error) {
+            return fail(500, { error: true, message: 'Failed to add new employee. Please try again.' })
         }
 
         await locals.logActivity(`Created employee "${name}" (ID: ${id})`)
-        return {success: true}
+        return { success: true }
     },
-    edit_employee : async ({request, locals}) => {
+    edit_employee: async ({ request, locals }) => {
         const formData = await request.formData()
 
         const uuid = formData.get('uuid') as string
@@ -62,7 +62,7 @@ export const actions: Actions = {
         const position = formData.get('position') as string
         const department = formData.get('department') as string
 
-        const {data, error } = await locals.supabase
+        const { data, error } = await locals.supabase
             .from('employees')
             .update({
                 employee_id: id,
@@ -73,7 +73,7 @@ export const actions: Actions = {
             })
             .eq('uuid', uuid)
 
-        if(error){
+        if (error) {
             console.log('Failed to update employee info:', error)
             return fail(500, {
                 error: true,
@@ -82,40 +82,53 @@ export const actions: Actions = {
         }
 
         await locals.logActivity(`Updated employee "${name}" (ID: ${id})`)
-        return {success: true}
+        return { success: true }
     },
-    delete_employee : async ({request, locals}) => {
+    deactivate_employee: async ({ request, locals }) => {
         const formData = await request.formData()
         const uuid = formData.get('uuid') as string
         const name = formData.get('employee_name') as string
         const id = formData.get('employee_id') as string
+        const position = formData.get('position') as string
+        const department_uuid = formData.get('department_uuid') as string
 
-        const { error } = await locals.supabase
-            .from('employees')
-            .delete()
-            .eq('uuid', uuid)
+        if (position === "Department Head") {
+            const { error: departmentError } = await locals.supabase
+                .from('departments')
+                .update({
+                    dept_head: null
+                })
+                .eq('uuid', department_uuid)
 
-        if(error){
-
-            const { error: errorUpdate } = await locals.supabase
-            .from('employees')
-            .update({
-                is_account_active: false
-            })
-            .eq('uuid', uuid)
-
-            if(errorUpdate){       
+            if (departmentError) {
                 return fail(500, {
                     error: true,
-                    message: 'Failed to delete employee info. Please try again later.'
+                    message: 'Failed to deactivate employee info. Please try again later.'
                 })
             }
         }
-        
-        await locals.logActivity(`Deleting employee "${name}" (ID: ${id})`)
-        return {success: true}
+
+        const { error: errorUpdate } = await locals.supabase
+            .from('employees')
+            .update({
+                is_account_active: false,
+                department: null,
+                position: null
+            })
+            .eq('uuid', uuid)
+
+        if (errorUpdate) {
+            return fail(500, {
+                error: true,
+                message: 'Failed to deactivate employee info. Please try again later.'
+            })
+        }
+
+
+        await locals.logActivity(`Deactivate Account: ${name} (ID: ${id})`)
+        return { success: true }
     },
-    update_role_employee : async ({request, locals}) => {
+    update_role_employee: async ({ request, locals }) => {
         const formData = await request.formData()
         const uuid = formData.get('uuid') as string
         const role_in_system = formData.get('role_in_system') as string
@@ -135,18 +148,18 @@ export const actions: Actions = {
             })
             .eq('uuid', uuid)
             .select()
-        
 
-        if(error){
+
+        if (error) {
             return fail(500, {
                 error: true,
                 message: 'Failed to update system role. Please try again later.'
             })
         }
 
-        console.log({data})
+        console.log({ data })
 
         await locals.logActivity(`Updated system role of "${name}" to "${role_in_system}" (ID: ${id})`)
-        return {success: true}
+        return { success: true }
     }
 };
