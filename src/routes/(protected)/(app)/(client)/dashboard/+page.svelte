@@ -14,11 +14,10 @@
 	
 	const employee = $derived(data.employee)
 	const creditInfo: CreditPointsInfo | undefined = $derived(data.creditInfo)
-	const currentStatus = $derived(data.currentStatus || 'none')
     const recentReports = $derived(data.recentReports || [])
 
 </script>
 
 <Greetings {employee} />
-<SectionCards {creditInfo} {currentStatus} />
+<SectionCards {creditInfo}/>
 <TableRecentReports {recentReports} />

@@ -17,7 +17,7 @@ export const columns: ColumnDef<IssuedLogs>[] = [
             column: column, // Add this
         }),
         cell: ({ getValue }) => {
-            return convertTimestamp(getValue<string>(), "full");
+            return convertTimestamp(getValue<string>(), "date");
             ;
         }
     },
