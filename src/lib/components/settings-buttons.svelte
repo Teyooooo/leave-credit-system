@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { MenuItem } from '$lib/types/icon';
-	import { File, FolderClock, Megaphone, UserRoundX } from '@lucide/svelte';
+	import { FolderClock, Megaphone, UserRoundX } from '@lucide/svelte';
 
 	const tabs: MenuItem[] = [
 		{
@@ -13,11 +13,6 @@
 			url: '/admin/settings/announcements',
 			icon: Megaphone
 		},
-        {
-            title: 'Template',
-            url: '/admin/settings/template',
-            icon: File,
-        },
 		{
             title: 'Inactive Accounts',
             url: '/admin/settings/inactive-accounts',

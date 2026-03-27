@@ -1,21 +1,18 @@
-import HistoryRequestTableAction from "$lib/components/history-request-table/history-request-table-action.svelte";
-import StatusCell from "$lib/components/history-request-table/status-cell.svelte";
-import { renderComponent } from "$lib/components/ui/data-table";
-import type { LeaveHistory } from "$lib/types/data";
-import { convertTimestamp } from "$lib/utils/helper";
+import type { IssuedLeaveHistory } from "$lib/types/data";
+import { convertTimestamp, parseLeavePointsSnapshot } from "$lib/utils/helper";
 import type { ColumnDef } from "@tanstack/table-core";
 
 
-export const columns: ColumnDef<LeaveHistory>[] = [
+export const columns: ColumnDef<IssuedLeaveHistory>[] = [
     {
-        accessorKey: "date_filed",
-        header: "Filed At",
+        accessorKey: "created_at",
+        header: "Issued At",
         cell: ({row}) => {
-            return `${convertTimestamp(row.original.date_filed, 'numericFull')}`
+            return `${convertTimestamp(row.original.created_at, 'numericFull')}`
         },
     },
     {
-        accessorKey: "type_leave",
+        accessorKey: "leave_title",
         header: "Type of Leave",
     },
     {
@@ -26,41 +23,21 @@ export const columns: ColumnDef<LeaveHistory>[] = [
         },
     },
     {
+        accessorKey: "leave_points_snapshot",
+        header: "Points Before Deduction",
+        cell: ({ row }) => {
+            return `${parseLeavePointsSnapshot(row.original.leave_points_snapshot)}`
+        }
+    },
+    {
         accessorKey: "total_days",
         header: "Total Days",
     },
     {
         accessorKey: "hr_name",
-        header: "Processed By",
+        header: "Issued By",
         cell: ({row})=>{
-            if(row.original.status === 'Decline' && row.original.hr_name === '-'){
-                return 'Department Head'
-            }
             return row.original.hr_name
         }
-    },
-    {
-        accessorKey: "processed_at",
-        header: "Processed At",
-        cell: ({row}) => {
-            return `${convertTimestamp(row.original.processed_at, 'numericFull')}`
-        },
-    }
-    ,
-    {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => {
-            return renderComponent(StatusCell, {
-                status: row.original.status,
-            });
-        },
-    },
-    {
-        id: "actions",
-        cell: ({ row }) => {
-        // You can pass whatever you need from `row.original` to the component
-        return renderComponent(HistoryRequestTableAction, { data: row.original });
-        },
     }
 ];

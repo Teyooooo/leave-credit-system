@@ -42,7 +42,8 @@ export interface CreditPointsInfo {
     updated_at: string,
     late_per_mins: number,
     sick_leave_points: number,
-    vacation_leave_points: number
+    vacation_leave_points: number,
+    period: string,
 }
 
 export interface IssuedLogs{
@@ -55,6 +56,8 @@ export interface IssuedLogs{
     vacation_leave_balance: number,
     employee_uuid: string,
     deducted_late: number,
+    remarks: string,
+    period: string,
 }
 
 export interface RecentReports {
@@ -134,11 +137,20 @@ export interface LeaveHistory extends AdminFiledLeaveInfo {
     dept_head_name: string;
 }
 
+export interface IssuedLeaveHistory {
+    uuid: string;
+    created_at: string;
+    leave_title: string,
+    leave_start: string,
+    leave_end: string,
+    total_days: number,
+    leave_points_snapshot: string;
+    hr_uuid: string;
+    hr_name: string;
+}
+
 export interface AdminDashboardInfo {
     employees: number;
-    pending: number;
-    approved: number;
-    declined: number;
 }
 
 export interface LowLevelBalance 
