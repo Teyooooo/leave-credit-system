@@ -17,7 +17,7 @@
 			</Card.Title>
 		</Card.Header>
 		<Card.Footer class="flex-col items-start gap-1.5 text-sm">
-			<a href="/leave-request" class="text-muted-foreground hover:underline">Request a leave</a>
+			<a href="/issued-leave" class="text-muted-foreground hover:underline">View issued leave</a>
 		</Card.Footer>
 	</Card.Root>
 	<Card.Root class="@container/card">
@@ -28,7 +28,7 @@
 			</Card.Title>
 		</Card.Header>
 		<Card.Footer class="flex-col items-start gap-1.5 text-sm">
-			<a href="/leave-request" class="text-muted-foreground hover:underline">Request a leave</a>
+			<a href="/issued-leave" class="text-muted-foreground hover:underline">View issued leave</a>
 		</Card.Footer>
 	</Card.Root>
 	<Card.Root class="@container/card">
