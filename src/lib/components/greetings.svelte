@@ -14,7 +14,7 @@
 	<h1 class="text-4xl font-bold">Hi, {isRouteInAdmin ? 'Admin' : ''} {displayName}!</h1>
 	<p class="text-sm/6">
 		{isRouteInAdmin
-			? 'You’re in control of leave credits and approvals.'
-			: 'View your leave balance, submit requests, and monitor approvals here.'}
+			? 'You’re in control of leave credits.'
+			: 'View your leave balance, and monitor recent reports here.'}
 	</p>
 </div>
