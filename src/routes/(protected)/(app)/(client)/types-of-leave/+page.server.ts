@@ -7,7 +7,6 @@ export const load = (async ({locals}) => {
     const { data, error } = await locals.supabase
         .from('types_of_leave')
         .select()
-        .eq('is_active', true)
 
     
     if(error){

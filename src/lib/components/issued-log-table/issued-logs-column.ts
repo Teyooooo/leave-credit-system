@@ -2,7 +2,6 @@
 import { convertTimestamp } from "$lib";
 import DataTableDeductedLateCell from "$lib/components/data-table/data-table-deducted-late-cell.svelte";
 import DataTableLateCell from "$lib/components/data-table/data-table-late-cell.svelte";
-import DataTablePeriodButton from "$lib/components/data-table/data-table-period-button.svelte";
 import DataTableTimestampButton from "$lib/components/data-table/data-table-timestamp-button.svelte";
 import { renderComponent } from "$lib/components/ui/data-table";
 import type { IssuedLogs } from "$lib/types/data";
@@ -22,15 +21,6 @@ export const columns: ColumnDef<IssuedLogs>[] = [
             ;
         }
     },
-    {
-        accessorKey: "period",
-        header: ({ column }) =>
-        renderComponent(DataTablePeriodButton, {
-            onclick: column.getToggleSortingHandler(),
-            column: column, // Add this
-        })
-    },
-
    {
     accessorKey: "sick_leave_earned",
     header: "Sick leave Earned",
@@ -64,10 +54,5 @@ export const columns: ColumnDef<IssuedLogs>[] = [
             value: row.original.deducted_late,
         });
     }
-  },
-  {
-    accessorKey: "remarks",
-    header: "Remarks",
-  },
-
+  }
 ];

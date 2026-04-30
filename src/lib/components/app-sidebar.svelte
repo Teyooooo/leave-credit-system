@@ -4,7 +4,7 @@
 	import { logo, title } from "$lib/store/webDesignStore";
 	import type { EmployeeData } from "$lib/types/data";
 	import type { MenuItem } from "$lib/types/icon";
-	import { ArrowLeft, Building2, CalendarFold, FolderClock, Gauge, LibraryBig, Settings2, ShieldUser, UserRound, UsersRound } from "@lucide/svelte/icons";
+	import { ArrowLeft, Building2, CalendarFold, FileCheckCorner, FilePenLine, Gauge, LibraryBig, Settings2, ShieldUser, SquareChartGantt, UserRound, UsersRound } from "@lucide/svelte/icons";
 	import NavMain from "./nav/nav-main.svelte";
 	import NavSecondary from "./nav/nav-secondary.svelte";
 	import NavUser from "./nav/nav-user.svelte";
@@ -25,11 +25,19 @@
 let navMain = $derived.by(() => {
     const base: MenuItem[] = [
         { title: "Dashboard", url: "/dashboard", icon: Gauge },
+        { title: "Leave Request", url: "/leave-request", icon: FilePenLine },
         { title: "Monthly Points Issued", url: "/monthly-points-issued", icon: CalendarFold },
-        { title: "Issued Leave", url: "/issued-leave", icon: FolderClock },
         { title: "Account Information", url: "/account-info", icon: UserRound },
         { title: "Types of Leave", url: "/types-of-leave", icon: LibraryBig },
     ]
+
+    if (employee.position.toLowerCase().trim() === 'department head') {
+        base.splice(2, 0, {
+            title: "Approve Request",
+            url: "/approve-request",
+            icon: FileCheckCorner,
+        })
+    }
 
     return base
 })
@@ -40,6 +48,11 @@ let navMain = $derived.by(() => {
 				title: "Dashboard",
 				url: "/admin/dashboard",
 				icon: Gauge,
+			},
+			{
+				title: "Requests",
+				url: "/admin/requests",
+				icon: SquareChartGantt,
 			},
 			{
 				title: "Employees",

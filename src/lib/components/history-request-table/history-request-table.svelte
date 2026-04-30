@@ -23,7 +23,7 @@
 	let { data, columns }: DataTableProps<TData, TValue> = $props();
 
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 15 });
-	let sorting = $state<SortingState>([{ id: 'created_at', desc: true }]);
+	let sorting = $state<SortingState>([{ id: 'processed_at', desc: true }]);
 	let globalFilter = $derived(page.url.searchParams.get('employee') ?? '')
 	let columnFilters = $state<ColumnFiltersState>([]);
 
@@ -80,7 +80,7 @@
 <div>
 	<!-- Filters -->
 		<div class="flex grow  justify-between items-center mb-4">
-            <p class="text-3xl font-bold">Issued Leave History</p>
+            <p class="text-3xl font-bold">Request History</p>
 
 
 			<Input

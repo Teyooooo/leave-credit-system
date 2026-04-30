@@ -14,6 +14,34 @@ export const load = (async ({locals}) => {
         employees = Number(totalEmployees) 
     }
 
+
+    // Getting the total pending, approved, declined
+    const [
+    { count: pending },
+    { count: approved },
+    { count: declined }
+    ] = await Promise.all([
+    locals.supabase
+        .from('filed_leave')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'Pending')
+        .eq('approve_by_dept_head', true),
+    locals.supabase
+        .from('filed_leave')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'Approve'),
+    locals.supabase
+        .from('filed_leave')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'Decline')
+    ])
+
+    let filedInfo = {
+    pending: pending ?? 0,
+    approved: approved ?? 0,
+    declined: declined ?? 0
+    }
+
     // Getting the 10 lowest leave points
     let { data: creditPoints, error: creditPointsError } = await locals.supabase
     .from('credit_points')
@@ -37,8 +65,16 @@ export const load = (async ({locals}) => {
         })) ?? []
     }
           
+
+            
+
+
+
     let cardInfo: AdminDashboardInfo = {
         employees,
+        pending: filedInfo.pending,
+        approved: filedInfo.approved,
+        declined: filedInfo.declined
     }
 
     return {

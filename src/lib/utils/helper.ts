@@ -188,17 +188,3 @@ export function convertLateIntoDecimalDay(minsLate: number){
 export function calculateLateDeduction(convertedLate: number, newBalance: number){
   return newBalance - convertedLate
 }
-
-export function parseLeavePointsSnapshot(input: string){
-
-		if (!input) return '-';
-
-		const [key, value] = input.trim().split(':');
-
-		if (key === 'SLP') {
-      return `Sick Leave: ${parseFloat(value.trim())}`
-		} else if (key === 'VLP') {
-      return `Vacation Leave: ${parseFloat(value.trim())}`
-		}
-
-	}

@@ -6,7 +6,6 @@ export const load = (async ({ locals }) => {
     const { data, error } = await locals.supabase
         .from('types_of_leave')
         .select()
-        .eq('is_active', true)
 
     if (error) {
         console.error("Database Error:", error)
@@ -136,25 +135,15 @@ export const actions: Actions = {
 
         if (errorDelete) {
             console.error("Database Error:", errorDelete)
-
-            const { error: errorTurnToInactive } = await locals.supabase
-            .from('types_of_leave')
-            .update({ is_active: false })
-            .eq('uuid', formData.get('uuid'))
-
-            if(errorTurnToInactive) {
-                console.error("Database Error:", errorTurnToInactive)
-                return fail(500, {
-                    error: false,
-                    message: 'Failed to delete leave. Please try again later.'
-                })
-            }
+            return fail(500, {
+                error: false,
+                message: 'Failed to delete leave. Please try again later.'
+            })
         }
 
         const { data, error: errorFetch } = await locals.supabase
             .from('types_of_leave')
             .select()
-            .eq('is_active', true)
 
         console.log({ data })
 

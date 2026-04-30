@@ -3,7 +3,7 @@ import type { PageServerLoad } from './$types';
 
 interface LateReport {
     minutes: number;
-    period: string;
+    date: string;
 }
 
 export const load = (async ({ locals, parent }) => {
@@ -24,11 +24,13 @@ export const load = (async ({ locals, parent }) => {
         }
     }
 
-    const logsIssued = data ?? []
+    const rows = data ?? []
 
-    let lateReport: LateReport 
+    const lateReport: LateReport | undefined = rows[0]
+        ? { minutes: rows[0].late_per_mins, date: rows[0].created_at }
+        : undefined
 
-    const formattedLogs: IssuedLogs[] = logsIssued.map(i => ({
+    const formattedLogs: IssuedLogs[] = rows.map(i => ({
         uuid: i.uuid,
         created_at: i.created_at,
         late_per_mins: i.late_per_mins,
@@ -37,28 +39,8 @@ export const load = (async ({ locals, parent }) => {
         sick_leave_balance: i.sick_leave_balance,
         vacation_leave_balance: i.vacation_leave_balance,
         employee_uuid: i.employee_uuid,
-        deducted_late: i?.deducted_late,
-        remarks: i?.remarks ?? '-',
-        period: i?.period
+        deducted_late: i?.deducted_late
     }))
-
-    // get the total of late
-    // Find the latest period by sorting period strings
-    const latestPeriod = logsIssued
-        ?.map(log => log.period)
-        .sort((a, b) => new Date(`01 ${b}`).getTime() - new Date(`01 ${a}`).getTime())[0]
-
-    // Get all items in that latest period
-    const latestPeriodLogs = logsIssued?.filter(log => log.period === latestPeriod)
-
-    // Sum up late_per_mins in the latest period
-    const totalLatePerMins = latestPeriodLogs?.reduce((sum, log) => sum + (log.late_per_mins || 0), 0) ?? 0
-
-    lateReport = {
-        minutes: totalLatePerMins,
-        period: latestPeriod
-    }
-    
 
     return {
         lateReport,
