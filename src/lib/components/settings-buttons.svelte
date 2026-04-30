@@ -1,12 +1,17 @@
 <script lang="ts">
 	import type { MenuItem } from '$lib/types/icon';
-	import { File, FolderClock, Megaphone, UserRoundX } from '@lucide/svelte';
+	import { File, FolderClock, Megaphone, UserRound, UserRoundX } from '@lucide/svelte';
 
 	const tabs: MenuItem[] = [
 		{
 			title: 'Activity Logs',
 			url: '/admin/settings/activity-logs',
 			icon: FolderClock
+		},
+		{
+			title: 'Campus Director',
+			url: '/admin/settings/campus-director',
+			icon: UserRound
 		},
 		{
 			title: 'Announcements',

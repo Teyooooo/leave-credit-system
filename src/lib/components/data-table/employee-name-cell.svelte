@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getInitials } from "$lib";
+	import { getInitials } from "$lib/utils/helper";
 	import * as Avatar from "$lib/components/ui/avatar";
 
   interface Props {
