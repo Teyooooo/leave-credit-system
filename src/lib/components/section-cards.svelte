@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as Card from "$lib/components/ui/card/index.js";
 	import type { CreditPointsInfo } from "$lib/types/data";
-	import { convertTimestamp } from "$lib/utils/helper";
 
 	let { creditInfo, currentStatus } : {creditInfo: CreditPointsInfo | undefined, currentStatus: string} = $props()
 
@@ -69,7 +68,7 @@
 	</Card.Root>
 	<Card.Root class="@container/card">
 		<Card.Header>
-			<Card.Description>{creditInfo?.updated_at ? convertTimestamp(creditInfo?.updated_at , 'monthYear') : 'Monthly'} Late Report</Card.Description>
+			<Card.Description>{creditInfo?.period} Late Report</Card.Description>
 			<Card.Title class="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
 				{creditInfo?.late_per_mins ?? 0} {(creditInfo?.late_per_mins ?? 0) > 0  ? 'minutes' : 'minute'}
 			</Card.Title>
