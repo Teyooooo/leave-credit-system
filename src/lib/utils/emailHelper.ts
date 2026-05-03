@@ -165,7 +165,7 @@ export function leaveDeclinedTemplate(
   days: number,
   reviewedBy: string,
   reason: string,
-  isHr: boolean = true
+  position: string
 ) {
   return `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f8;">
@@ -200,7 +200,7 @@ export function leaveDeclinedTemplate(
                 Hi <strong>${name}</strong>,
               </p>
               <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6;">
-                We regret to inform you that your leave request has been <strong style="color:#dc2626;">declined</strong> by your ${isHr ? 'HR' : 'Department Head'}. Here's a summary:
+                We regret to inform you that your leave request has been <strong style="color:#dc2626;">declined</strong> by your ${position}. Here's a summary:
               </p>
 
               <!-- Info Table -->

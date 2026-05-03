@@ -25,7 +25,8 @@ export const load = (async ({locals}) => {
         .from('filed_leave')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'Pending')
-        .eq('approve_by_dept_head', true),
+        .eq('approve_by_dept_head', true)
+        .eq('approve_by_CD', true),
     locals.supabase
         .from('filed_leave')
         .select('*', { count: 'exact', head: true })

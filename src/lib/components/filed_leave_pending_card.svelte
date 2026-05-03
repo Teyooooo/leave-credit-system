@@ -62,84 +62,105 @@
 	});
 
 	// for the reason
-	let form_reason = $derived(filedInfo.reason)
+	let form_reason = $derived(filedInfo.reason);
 
-	const toLocalDateStr = (ts: string) => 
+	const toLocalDateStr = (ts: string) =>
 		toCalendarDate(fromDate(new Date(ts), getLocalTimeZone())).toString();
 
 	let valueHasChange = $derived(
-		form_leave_selected !== (listsOfLeave?.find((f) => f?.name === filedInfo.type_leave)?.uuid ?? '') ||
-		form_date_range.start?.toString() !== toLocalDateStr(filedInfo.leave_start) ||
-		form_date_range.end?.toString() !== toLocalDateStr(filedInfo.leave_end) ||
-		form_contact_number !== filedInfo.contact_number ||
-		form_reason !== filedInfo.reason
+		form_leave_selected !==
+			(listsOfLeave?.find((f) => f?.name === filedInfo.type_leave)?.uuid ?? '') ||
+			form_date_range.start?.toString() !== toLocalDateStr(filedInfo.leave_start) ||
+			form_date_range.end?.toString() !== toLocalDateStr(filedInfo.leave_end) ||
+			form_contact_number !== filedInfo.contact_number ||
+			form_reason !== filedInfo.reason
 	);
-	$effect(()=>{
-		console.log({valueHasChange})
-	})
+	$effect(() => {
+		console.log({ valueHasChange });
+	});
 
-
-	function reset_form(){
+	function reset_form() {
 		form_date_range = {
 			start: toCalendarDate(fromDate(new Date(filedInfo.leave_start), getLocalTimeZone())),
 			end: toCalendarDate(fromDate(new Date(filedInfo.leave_end), getLocalTimeZone()))
 		};
 		form_leave_selected = listsOfLeave?.find((f) => f?.name === filedInfo.type_leave)?.uuid ?? '';
 		form_contact_number = filedInfo.contact_number;
-		form_reason = filedInfo.reason
+		form_reason = filedInfo.reason;
 	}
 
+	function applicationReviewStatus(filedInfo: ClientFiledLeaveInfo) {
+		console.log({ filedInfo });
 
+		if (!filedInfo.approve_by_dept_head && !filedInfo.approve_by_CD) {
+			return 'Department Head';
+		}
+
+		if (filedInfo.approve_by_dept_head && !filedInfo.approve_by_CD) {
+			return 'Campus Director';
+		}
+
+		if (filedInfo.approve_by_dept_head && filedInfo.approve_by_CD) {
+			return 'HR';
+		}
+
+		return 'Under Review';
+	}
 </script>
 
 <Card.Root class="flex flex-row! gap-4">
 	<div class="grow">
 		<Card.Header class="mb-2">
-			<div class="flex gap-10 items-center">
+			<div class="flex items-center gap-10">
 				<Card.Title>{filedInfo.type_leave}</Card.Title>
-				<Badge class="bg-amber-500 text-black-500">Pending</Badge>
+				<Badge class="bg-amber-500 text-black">Pending</Badge>
 			</div>
-			<Card.Description class="text-[12px]">Filed at: {convertTimestamp(filedInfo.date_filed, 'full')}</Card.Description>
+			<Card.Description class="text-[12px]"
+				>Filed at: {convertTimestamp(filedInfo.date_filed, 'full')}</Card.Description
+			>
 		</Card.Header>
-		<Card.Content class="[&_div>p:first-child]:text-muted-foreground [&_div>p:first-child]:font-light [&_div>p:last-child]:font-semibold  **:text-sm" >
+		<Card.Content
+			class="**:text-sm [&_div>p:first-child]:font-light [&_div>p:first-child]:text-muted-foreground  [&_div>p:last-child]:font-semibold"
+		>
 			<div class="flex gap-3">
+				<p>Leave Date:</p>
 				<p>
-					Leave Date:
-				</p>
-				<p>
-					{convertTimestamp(filedInfo.leave_start, 'date')} - {convertTimestamp(filedInfo.leave_end,'date')}
+					{convertTimestamp(filedInfo.leave_start, 'date')} - {convertTimestamp(
+						filedInfo.leave_end,
+						'date'
+					)}
 				</p>
 			</div>
 			<div class="flex gap-3">
-				<p>
-					Total Days:
-				</p>
+				<p>Total Days:</p>
 				<p>
 					{filedInfo.total_days}
-				{filedInfo.total_days > 1 ? 'days' : 'day'}
+					{filedInfo.total_days > 1 ? 'days' : 'day'}
 				</p>
 			</div>
 			<div class="flex gap-3">
-				<p>
-					Contact Number:
-				</p>
+				<p>Contact Number:</p>
 				<p>
 					{filedInfo.contact_number}
 				</p>
 			</div>
 			<div class="flex gap-3">
-				<p>
-					Reason:
-				</p>
+				<p>Reason:</p>
 				<q class="italic">{filedInfo.reason}</q>
 			</div>
 		</Card.Content>
 	</div>
-	<Card.Footer class="flex flex-col-reverse gap-2">
-		<Button onclick={() => (editDialogStates[filedInfo.uuid] = true)}><SquarePen /></Button>
-		<Button variant="destructive" onclick={() => (deleteDialogStates[filedInfo.uuid] = true)}
-			><Trash />
-		</Button>
+	<Card.Footer class="flex flex-col justify-end">
+		<Badge class="text-black-500 bg-green-700"
+			>Under {applicationReviewStatus(filedInfo)} Review</Badge
+		>
+		<div class="flex w-full grow flex-col items-end justify-end gap-2">
+			<Button variant="destructive" onclick={() => (deleteDialogStates[filedInfo.uuid] = true)}
+				><Trash />
+			</Button>
+
+			<Button disabled={filedInfo.approve_by_dept_head} onclick={() => (editDialogStates[filedInfo.uuid] = true)}><SquarePen /></Button>
+		</div>
 	</Card.Footer>
 </Card.Root>
 
@@ -153,7 +174,7 @@
 			editErrorStates[filedInfo.uuid] = undefined;
 		}
 
-		reset_form()
+		reset_form();
 	}}
 >
 	<form
@@ -235,7 +256,11 @@
 					<p class="text-sm">Total Days: {totalDays}</p>
 				</div>
 				<div class="grid gap-2">
-					<RangeCalendar bind:value={form_date_range} class="rounded-lg border" numberOfMonths={2} />
+					<RangeCalendar
+						bind:value={form_date_range}
+						class="rounded-lg border"
+						numberOfMonths={2}
+					/>
 
 					{#if !isDateRangeValid}
 						<p class="text-sm text-red-600">

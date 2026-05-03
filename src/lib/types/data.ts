@@ -100,7 +100,9 @@ export interface ClientFiledLeaveInfo {
     contact_number: string,
     reason: string,
     status: string,
-    hr_name: string
+    hr_name: string,
+    approve_by_dept_head: boolean,
+    approve_by_CD: boolean,
 } 
 
 export interface AdminFiledLeaveInfo {

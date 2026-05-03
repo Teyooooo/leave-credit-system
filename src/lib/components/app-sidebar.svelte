@@ -22,25 +22,13 @@
 	})
 
 
-let navMain = $derived.by(() => {
-    const base: MenuItem[] = [
+let navMain: MenuItem[] = [
         { title: "Dashboard", url: "/dashboard", icon: Gauge },
         { title: "Leave Request", url: "/leave-request", icon: FilePenLine },
         { title: "Monthly Points Issued", url: "/monthly-points-issued", icon: CalendarFold },
         { title: "Account Information", url: "/account-info", icon: UserRound },
         { title: "Types of Leave", url: "/types-of-leave", icon: LibraryBig },
     ]
-
-    if (employee.position.toLowerCase().trim() === 'department head') {
-        base.splice(2, 0, {
-            title: "Approve Request",
-            url: "/approve-request",
-            icon: FileCheckCorner,
-        })
-    }
-
-    return base
-})
 
 
 	const adminNavMain: MenuItem[] = [
@@ -100,7 +88,7 @@ let navMain = $derived.by(() => {
 		</Sidebar.Menu>
 	</Sidebar.Header>
 	<Sidebar.Content>
-		<NavMain items={isAdminRoute ? adminNavMain : navMain} />
+		<NavMain items={isAdminRoute ? adminNavMain : navMain} employeePosition={employee.position} {isAdminRoute} />
 		<NavSecondary items={isUserAdmin ? navSecondary : []} class="mt-auto" />
 	</Sidebar.Content>
 	<Sidebar.Footer>

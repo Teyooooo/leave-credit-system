@@ -58,8 +58,9 @@
 				method="post"
 				use:enhance={({ formData }) => {
 					
-					formData.append('hr_uuid', revieweeInfo.uuid);
-					formData.append('hr_name', revieweeInfo.name);
+					formData.append('reviewee_uuid', revieweeInfo.uuid);
+					formData.append('reviewee_name', revieweeInfo.name);
+					formData.append('reviewee_position', revieweeInfo.position);
 					formData.append('applicant_uuid', filedInfo.employee_uuid);
 					formData.append('applicant_email', filedInfo.employee_email);
 					formData.append('sick_leave_points', String(filedInfo.sick_points));
@@ -121,8 +122,9 @@
 		method="post"
 		use:enhance={({ formData }) => {
 
-			formData.append('hr_uuid', revieweeInfo.uuid);
-			formData.append('hr_name', revieweeInfo.name);
+			formData.append('reviewee_uuid', revieweeInfo.uuid);
+			formData.append('reviewee_name', revieweeInfo.name);
+			formData.append('reviewee_position', revieweeInfo.position);
 			formData.append('uuid', filedInfo.filed_uuid);
 			formData.append('applicant_name', filedInfo.employee_name);
 			formData.append('applicant_email', filedInfo.employee_email);

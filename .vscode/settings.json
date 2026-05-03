@@ -9,5 +9,6 @@
 		"pizzip",
 		"reviewee",
 		"supabase"
-	]
+	],
+	"postman.settings.dotenv-detection-notification-visibility": false
 }

@@ -12,7 +12,7 @@
     let { pendingLeave, employee } = $derived(data)
 </script>
 
-<HeaderPage title={"Approve Requests"} message={"Review and take action on employee leave requests in your role as a department head."} />
+<HeaderPage title={"Approve Requests"} message={`Review and take action on employee leave requests in your role as a ${employee.position.toLocaleLowerCase()}.`} />
 
 <div class="mx-6 min-h-96 w-[100%-1.5rem] grid gap-4">
 	<PendingApprovalContainer filedLeave={pendingLeave} historyRoute={'/approve-request/history'} revieweeInfo={employee} />

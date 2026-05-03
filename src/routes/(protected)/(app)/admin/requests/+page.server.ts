@@ -17,6 +17,7 @@ export const load = (async ({locals}) => {
         )
         .eq('status', 'Pending')
         .eq('approve_by_dept_head', true)
+        .eq('approve_by_CD', true)
         .order('date_filed', { ascending: false })
 
     
@@ -173,7 +174,7 @@ export const actions: Actions = {
 
         await locals.logActivity(`Declined leave application for ${applicant_name} (ID: ${applicant_id}) as a HR`)
 
-        await sendLeaveEmail('declined', applicant_email, leaveDeclinedTemplate(applicant_name, type_leave, start_date, end_date, Number(total_days), hr_name, reason))
+        await sendLeaveEmail('declined', applicant_email, leaveDeclinedTemplate(applicant_name, type_leave, start_date, end_date, Number(total_days), hr_name, reason,'HR'))
 
         return { success: true }
     }
