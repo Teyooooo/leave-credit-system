@@ -28,6 +28,11 @@ let navMain: MenuItem[] = [
         { title: "Monthly Points Issued", url: "/monthly-points-issued", icon: CalendarFold },
         { title: "Account Information", url: "/account-info", icon: UserRound },
         { title: "Types of Leave", url: "/types-of-leave", icon: LibraryBig },
+		{
+				title: "Settings",
+				url: "/settings",
+				icon: Settings2
+			}
     ]
 
 

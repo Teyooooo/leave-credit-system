@@ -3,6 +3,7 @@ import { leaveApprovedTemplate, leaveDeclinedTemplate, sendLeaveEmail } from '$l
 import { convertCalendarDate, currentTimestamp, getTotalDays } from '$lib/utils/helper';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { sendPushNotification } from '$lib/server/pushHelper';
 
 export const load = (async ({locals}) => {
 
@@ -133,6 +134,8 @@ export const actions: Actions = {
           
 
         await locals.logActivity(`Approved leave application for ${applicant_name} (ID: ${applicant_id}) as a HR`)
+
+        await sendPushNotification(locals, applicant_uuid, 'Leave Application Update', `Your leave application has been approved by the HR.`);
 
         await sendLeaveEmail('approved', applicant_email, leaveApprovedTemplate(applicant_name, type_leave, start_date, end_date, Number(total_days), hr_name))
 

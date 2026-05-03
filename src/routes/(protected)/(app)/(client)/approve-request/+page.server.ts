@@ -4,6 +4,8 @@ import { convertCalendarDate, currentTimestamp, getTotalDays } from '$lib/utils/
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import type { PostgrestError } from '@supabase/supabase-js';
+import { sendPushNotification } from '$lib/server/pushHelper';
+import { applyLanes } from 'layerchart';
 
 export const load = (async ({ locals, parent }) => {
 	const { employee } = await parent();
@@ -144,15 +146,16 @@ export const actions: Actions = {
 		const applicant_name = formData.get('applicant_name') as string;
 		const applicant_id = formData.get('applicant_id') as string;
 		const reviewee_position = formData.get('reviewee_position') as string;
-
-
+		const applicant_uuid = formData.get('applicant_uuid') as string;
+		
+		
 		const { error } = await locals.supabase
-			.from('filed_leave')
-			.update(
-				reviewee_position === 'Department Head' ? { approve_by_dept_head: true } : { approve_by_CD: true },
-			)
-			.eq('uuid', uuid);
-
+		.from('filed_leave')
+		.update(
+			reviewee_position === 'Department Head' ? { approve_by_dept_head: true } : { approve_by_CD: true },
+		)
+		.eq('uuid', uuid);
+		
 		if (error) {
 			return fail(500, {
 				error: true,
@@ -160,6 +163,8 @@ export const actions: Actions = {
 			});
 		}
 
+		await sendPushNotification( locals, applicant_uuid, 'Leave Application Update', `Your leave application has been approved by the ${reviewee_position}.`);
+		
 		await locals.logActivity(
 			`Approved leave application for ${applicant_name} (ID: ${applicant_id}) as a ${reviewee_position}`
 		);
