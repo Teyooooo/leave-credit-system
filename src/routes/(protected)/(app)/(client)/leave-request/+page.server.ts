@@ -35,6 +35,7 @@ export const load = (async ({locals, parent}) => {
     const { data: listsLeave, error: listsLeaveError } = await locals.supabase
         .from('types_of_leave')
         .select()
+        .eq('is_active', true)
 
     let listsOfLeave: LeaveData[] = [] 
     if (listsLeaveError) {
