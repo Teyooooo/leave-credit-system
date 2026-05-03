@@ -128,6 +128,7 @@
 			formData.append('uuid', filedInfo.filed_uuid);
 			formData.append('applicant_name', filedInfo.employee_name);
 			formData.append('applicant_email', filedInfo.employee_email);
+			formData.append('applicant_uuid', filedInfo.employee_uuid);
 			formData.append('type_leave', filedInfo.type_leave);
 			formData.append('start_date', convertTimestamp(filedInfo.leave_start, 'date'));
 			formData.append('end_date', convertTimestamp(filedInfo.leave_end, 'date'));

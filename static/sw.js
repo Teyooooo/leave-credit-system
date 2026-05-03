@@ -4,8 +4,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title ?? 'Notification', {
       body: data.body ?? '',
-      icon: data.icon ?? '/src/lib/assets/leave_credit_system_logo.png',
-      badge: data.badge ?? '/src/lib/assets/leave_credit_system_logo.png',
+      icon: 'logo.png',
+      badge: 'logo.png',
       data: data.url ? { url: data.url } : undefined,
     })
   );

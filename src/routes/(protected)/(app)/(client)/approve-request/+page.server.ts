@@ -179,6 +179,7 @@ export const actions: Actions = {
 		const applicant_name = formData.get('applicant_name') as string;
 		const applicant_id = formData.get('applicant_id') as string;
 		const applicant_email = formData.get('applicant_email') as string;
+		const applicant_uuid = formData.get('applicant_uuid') as string;
 		const reviewee_uuid = formData.get('reviewee_uuid') as string;
 		const reviewee_name = formData.get('reviewee_name') as string;
 		const reviewee_position = formData.get('reviewee_position') as string;
@@ -207,6 +208,8 @@ export const actions: Actions = {
 		await locals.logActivity(
 			`Declined leave application for ${applicant_name} (ID: ${applicant_id}) as a ${reviewee_position}`
 		);
+
+		await sendPushNotification( locals, applicant_uuid, 'Leave Application Update', `Your leave application has been declined by the ${reviewee_position}.`);
 
 		await sendLeaveEmail(
 			'declined',
