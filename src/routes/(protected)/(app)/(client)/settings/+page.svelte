@@ -2,10 +2,12 @@
 	import HeaderPage from '$lib/components/header-page.svelte';
 	import PushNotification from '$lib/components/push-notification.svelte';
 	import * as  Card from '$lib/components/ui/card';
+	import { web_path_header } from '$lib/store/webDesignStore';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
     let { employee, userIsSubscription } = $derived(data);
+	$web_path_header = [{ path_name: 'Settings', route: '/settings' }];
 
 </script>
 
