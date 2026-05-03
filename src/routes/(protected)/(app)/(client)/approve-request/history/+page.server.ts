@@ -32,6 +32,12 @@ export const load = (async ({locals, parent}) => {
             .in('employee_uuid', listOfEmployeeUuids)
             .in('status', ['Approve', 'Decline'])
             .order('date_filed', { ascending: false })
+
+    const { data: campus_director_info } = await locals.supabase
+        .from('employees')
+        .select('employee_name')
+        .eq('position', 'Campus Director')
+        .single()
     
         
         let leaveHistory: LeaveHistory[] = []
@@ -62,7 +68,8 @@ export const load = (async ({locals, parent}) => {
                 processed_at: i?.processed_at,
                 decline_reason: i?.decline_reason,
                 leave_points_snapshot: i?.leave_points_snapshot,
-                dept_head_name: employee.name
+                dept_head_name: employee.name,
+                campus_director_name: campus_director_info?.employee_name ?? ''
             }))
             }
 

@@ -42,6 +42,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             "reasonForLeave": data.reason,
             "fullNameCapital": String(data.employee_name).toUpperCase(),
             "deptHeadFullNameCapital": String(data.dept_head_name).toLocaleUpperCase(),
+            "cdFullNameCapital": String(data.campus_director_name).toUpperCase(),
             "hrFullNameCapital": String(data.hr_name).toUpperCase(),
         });
 

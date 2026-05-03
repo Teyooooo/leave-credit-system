@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import TemplateAfter from '$lib/assets/template_after.png';
-	import TemplateBefore from '$lib/assets/template_before.png';
+	import TemplateAfter from '$lib/assets/template_after.jpg';
+	import TemplateBefore from '$lib/assets/template_before.jpg';
 	import BackButton from '$lib/components/back-button.svelte';
 	import HeaderPage from '$lib/components/header-page.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -95,9 +95,14 @@
 			description: 'Printed name for department head signature'
 		},
 		{
-			name: 'HR / Manager Name (Capitalized)',
+			name: 'Campus Director Name (Capitalized)',
+			placeholder: '{cdFullNameCapital}',
+			description: 'Printed name for campus director signature'
+		},
+		{
+			name: 'HR / Admin Name (Capitalized)',
 			placeholder: '{hrFullNameCapital}',
-			description: 'Printed name for HR or manager approval'
+			description: 'Printed name for HR or Admin approval'
 		}
 	];
 </script>

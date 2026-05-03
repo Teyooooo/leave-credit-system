@@ -137,6 +137,7 @@ export interface LeaveHistory extends AdminFiledLeaveInfo {
     decline_reason: string;
     leave_points_snapshot: string;
     dept_head_name: string;
+    campus_director_name: string;
 }
 
 export interface IssuedLeaveHistory {

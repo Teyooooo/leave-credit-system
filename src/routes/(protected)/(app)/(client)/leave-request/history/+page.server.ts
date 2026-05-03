@@ -12,7 +12,8 @@ export const load = (async ({locals, parent}) => {
 
     const [
         { data, error },
-        { data: dept_head}
+        { data: dept_head},
+        { data: campus_director_info }
     ] = await Promise.all([
             locals.supabase
                 .from('filed_leave')
@@ -29,6 +30,11 @@ export const load = (async ({locals, parent}) => {
                 .from('departments')
                 .select('info: employees!dept_head( employee_name )')
                 .eq('uuid', employee.department_uuid)
+                .single(),
+            locals.supabase                
+                .from('employees')
+                .select('employee_name')
+                .eq('position', 'Campus Director')
                 .single()
         ])
     
@@ -61,7 +67,8 @@ export const load = (async ({locals, parent}) => {
                 processed_at: i?.processed_at,
                 decline_reason: i?.decline_reason,
                 leave_points_snapshot: i?.leave_points_snapshot,
-                dept_head_name: dept_head?.info?.employee_name ?? ''
+                dept_head_name: dept_head?.info?.employee_name ?? '',
+                campus_director_name: campus_director_info?.employee_name ?? ''
             })) 
             }
 

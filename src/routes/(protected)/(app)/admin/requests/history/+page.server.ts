@@ -6,7 +6,8 @@ export const load = (async ({locals}) => {
 
     const [
         {data: leave_histories, error: leave_histories_error},
-        {data: departments}
+        {data: departments},
+        {data: campus_director_info}
     ] = await Promise.all([
         locals.supabase
             .from('filed_leave')
@@ -23,7 +24,12 @@ export const load = (async ({locals}) => {
             .from('departments')
             .select(`*, 
                 head_info: employees!dept_head( employee_name )
-                `)
+                `),
+        locals.supabase
+            .from('employees')
+            .select('employee_name')
+            .eq('position', 'Campus Director')
+            .single()
     ])
 
 
@@ -35,6 +41,7 @@ export const load = (async ({locals}) => {
             head_name: i?.head_info?.employee_name
         })) || []
 
+        console.log(campus_director_info)
 
     
         let leaveHistory: LeaveHistory[] = []
@@ -65,7 +72,9 @@ export const load = (async ({locals}) => {
                 processed_at: i?.processed_at,
                 decline_reason: i?.decline_reason,
                 leave_points_snapshot: i?.leave_points_snapshot,
-                dept_head_name: listOfDepartments.find(dept => dept.name === i?.employee_info?.department_info?.name )?.head_name ?? ''
+                dept_head_name: listOfDepartments.find(dept => dept.name === i?.employee_info?.department_info?.name )?.head_name ?? '',
+                campus_director_name: campus_director_info?.employee_name ?? ''
+
             }))
             }
 
