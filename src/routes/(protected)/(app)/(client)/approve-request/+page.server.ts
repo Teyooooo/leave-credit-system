@@ -1,5 +1,5 @@
 import type { AdminFiledLeaveInfo } from '$lib/types/data';
-import { leaveDeclinedTemplate, sendLeaveEmail } from '$lib/utils/emailHelper';
+import { leaveApprovedTemplate, leaveDeclinedTemplate, sendLeaveEmail } from '$lib/utils/emailHelper';
 import { convertCalendarDate, currentTimestamp, getTotalDays } from '$lib/utils/helper';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
@@ -17,12 +17,12 @@ export const load = (async ({ locals, parent }) => {
 	console.log({ employee });
 
 	if (employee.position === 'Campus Director') {
-        console.log('Campus Director loading pending requests...');
+		console.log('Campus Director loading pending requests...');
 		// for CD get all employees in the system except other CD
 		let { data: employees, error: employeesError } = await locals.supabase
 			.from('employees')
 			.select('uuid')
-            .eq('is_account_active', true)
+			.eq('is_account_active', true)
 			.neq('uuid', employee.uuid);
 
 		if (!employeesError) {
@@ -30,7 +30,7 @@ export const load = (async ({ locals, parent }) => {
 			listOfEmployeeUuids = employees?.map((i) => i?.uuid) || [];
 		}
 
-        console.log({ listOfEmployeeUuids });
+		console.log({ listOfEmployeeUuids });
 
 		// sunod kay kuhaon if naay pending mga gipang file nga leave
 		let { data, error } = await locals.supabase
@@ -45,22 +45,23 @@ export const load = (async ({ locals, parent }) => {
 			)
 			.in('employee_uuid', listOfEmployeeUuids)
 			.eq('status', 'Pending')
+			.eq('approve_by_HR', true)
 			.eq('approve_by_dept_head', true)
 			.eq('approve_by_CD', false)
 			.order('date_filed', { ascending: false });
 
-        console.log('Filed Leave for CD:', { data, error });
+		console.log('Filed Leave for CD:', { data, error });
 
 		filedLeave = data;
 		filedLeaveError = error;
 	} else if (employee.position === 'Department Head') {
-        console.log('Department Head loading pending requests...');
+		console.log('Department Head loading pending requests...');
 		// getting the list of pending request in the same department
 		// unahon og kuha ang mga list of employees sa department
 		let { data: employees, error: employeesError } = await locals.supabase
 			.from('employees')
 			.select('uuid')
-            .eq('is_account_active', true)
+			.eq('is_account_active', true)
 			.eq('department', employee.department_uuid);
 
 		if (!employeesError) {
@@ -81,6 +82,7 @@ export const load = (async ({ locals, parent }) => {
 			)
 			.in('employee_uuid', listOfEmployeeUuids)
 			.eq('status', 'Pending')
+			.eq('approve_by_HR', true)
 			.eq('approve_by_dept_head', false)
 			.order('date_filed', { ascending: false });
 
@@ -142,29 +144,93 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		console.log('Approve:', { formData });
 
-		const uuid = formData.get('uuid') as string;
-		const applicant_name = formData.get('applicant_name') as string;
-		const applicant_id = formData.get('applicant_id') as string;
+		const uuid = formData.get('uuid') as string
+        const applicant_name = formData.get('applicant_name') as string
+        const applicant_id = formData.get('applicant_id') as string
+        const applicant_uuid = formData.get('applicant_uuid') as string
+        const applicant_email = formData.get('applicant_email') as string
+		const reviewee_uuid = formData.get('reviewee_uuid') as string;
+		const reviewee_name = formData.get('reviewee_name') as string;
 		const reviewee_position = formData.get('reviewee_position') as string;
-		const applicant_uuid = formData.get('applicant_uuid') as string;
-		
-		
-		const { error } = await locals.supabase
-		.from('filed_leave')
-		.update(
-			reviewee_position === 'Department Head' ? { approve_by_dept_head: true } : { approve_by_CD: true },
-		)
-		.eq('uuid', uuid);
-		
-		if (error) {
-			return fail(500, {
-				error: true,
-				message: `Failed to approve request by the ${reviewee_position}. Try again later.`
-			});
+        const type_leave = formData.get('type_leave') as string
+        const start_date = formData.get('start_date') as string
+        const end_date = formData.get('end_date') as string
+        const total_days = formData.get('total_days') as string
+        const sick_leave_points = formData.get('sick_leave_points') as string
+        const vacation_leave_points = formData.get('vacation_leave_points') as string
+
+
+		if (reviewee_position === 'Campus Director') {
+
+			// check is the leave is sick or vacation
+			const where_to_update = type_leave === 'Sick Leave' ? 'sick_leave_points'
+				: type_leave === 'Vacation Leave' ? 'vacation_leave_points'
+				: 'others'
+
+			const snapshot_points = type_leave === 'Sick Leave' ? `SLP: ${sick_leave_points} `
+				: type_leave === 'Vacation Leave' ? `VLP: ${vacation_leave_points}`
+				: null
+
+			const {data: hr_info, error } = await locals.supabase
+				.from('filed_leave')
+				.update({
+					approve_by_CD: true,
+					status: 'Approve', // move to CD
+					processed_at: currentTimestamp(), // move to  CD
+					leave_points_snapshot: snapshot_points // move to CD
+				})
+				.eq('uuid', uuid)
+				.select(`hr: employees!hr_uuid( employee_name )`)
+				.single();
+
+			if (error) {
+				return fail(500, {
+					error: true,
+					message: `Failed to approve request by the ${reviewee_position}. Try again later.`
+				});
+			}
+	
+			const updated_points = type_leave === 'Sick Leave' ? Number(sick_leave_points) - Number(total_days)
+									: type_leave === 'Vacation Leave' ? Number(vacation_leave_points) - Number(total_days)
+									: 0
+	
+			const { error: creditPointsError} = await locals.supabase
+			.from('credit_points')
+			.update({ [where_to_update]:  updated_points})
+			.eq('employee_uuid', applicant_uuid)
+	
+			if(creditPointsError){
+				return fail(500, {
+					error: true,
+					message: 'Failed to update points. Try again later.'
+				})
+			}
+
+			// TODO: moved to CD
+        	await sendLeaveEmail('approved', applicant_email, leaveApprovedTemplate(applicant_name, type_leave, start_date, end_date, Number(total_days), hr_info?.hr?.employee_name ?? 'HR'))
+
+
+		} else {
+			const { error } = await locals.supabase
+				.from('filed_leave')
+				.update({ approve_by_dept_head: true })
+				.eq('uuid', uuid);
+
+			if (error) {
+				return fail(500, {
+					error: true,
+					message: `Failed to approve request by the ${reviewee_position}. Try again later.`
+				});
+			}
 		}
 
-		await sendPushNotification( locals, applicant_uuid, 'Leave Application Update', `Your leave application has been approved by the ${reviewee_position}.`);
-		
+		await sendPushNotification(
+			locals,
+			applicant_uuid,
+			'Leave Application Update',
+			`Your leave application has been approved by the ${reviewee_position}.`
+		);
+
 		await locals.logActivity(
 			`Approved leave application for ${applicant_name} (ID: ${applicant_id}) as a ${reviewee_position}`
 		);
@@ -209,7 +275,12 @@ export const actions: Actions = {
 			`Declined leave application for ${applicant_name} (ID: ${applicant_id}) as a ${reviewee_position}`
 		);
 
-		await sendPushNotification( locals, applicant_uuid, 'Leave Application Update', `Your leave application has been declined by the ${reviewee_position}.`);
+		await sendPushNotification(
+			locals,
+			applicant_uuid,
+			'Leave Application Update',
+			`Your leave application has been declined by the ${reviewee_position}.`
+		);
 
 		await sendLeaveEmail(
 			'declined',

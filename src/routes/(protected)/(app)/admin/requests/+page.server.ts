@@ -1,5 +1,5 @@
 import type { AdminFiledLeaveInfo } from '$lib/types/data';
-import { leaveApprovedTemplate, leaveDeclinedTemplate, sendLeaveEmail } from '$lib/utils/emailHelper';
+import { leaveDeclinedTemplate, sendLeaveEmail } from '$lib/utils/emailHelper';
 import { convertCalendarDate, currentTimestamp, getTotalDays } from '$lib/utils/helper';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
@@ -17,8 +17,9 @@ export const load = (async ({locals}) => {
             )`
         )
         .eq('status', 'Pending')
-        .eq('approve_by_dept_head', true)
-        .eq('approve_by_CD', true)
+        .eq('approve_by_HR', false)
+        .eq('approve_by_dept_head', false)
+        .eq('approve_by_CD', false)
         .order('date_filed', { ascending: false })
 
     
@@ -79,33 +80,13 @@ export const actions: Actions = {
         const applicant_name = formData.get('applicant_name') as string
         const applicant_id = formData.get('applicant_id') as string
         const applicant_uuid = formData.get('applicant_uuid') as string
-        const applicant_email = formData.get('applicant_email') as string
-        const hr_uuid = formData.get('hr_uuid') as string
-        const hr_name = formData.get('hr_name') as string
-        const type_leave = formData.get('type_leave') as string
-        const start_date = formData.get('start_date') as string
-        const end_date = formData.get('end_date') as string
-        const total_days = formData.get('total_days') as string
-        const sick_leave_points = formData.get('sick_leave_points') as string
-        const vacation_leave_points = formData.get('vacation_leave_points') as string
+        const hr_uuid = formData.get('reviewee_uuid') as string
 
-        // check is the leave is sick or vacation
-        const where_to_update = type_leave === 'Sick Leave' ? 'sick_leave_points'
-            : type_leave === 'Vacation Leave' ? 'vacation_leave_points'
-            : 'others'
-
-        const snapshot_points = type_leave === 'Sick Leave' ? `SLP: ${sick_leave_points} `
-                              : type_leave === 'Vacation Leave' ? `VLP: ${vacation_leave_points}`
-                              : null
-        
-        
         const { error } = await locals.supabase
             .from('filed_leave')
             .update({
-                status: 'Approve',
                 hr_uuid: hr_uuid,
-                processed_at: currentTimestamp(),
-                leave_points_snapshot: snapshot_points
+                approve_by_HR: true,
             })
             .eq('uuid', uuid)
 
@@ -114,30 +95,11 @@ export const actions: Actions = {
                 error: true,
                 message: 'Failed to approve request. Try again later.'
             })
-        }
-
-        const updated_points = type_leave === 'Sick Leave' ? Number(sick_leave_points) - Number(total_days)
-                              : type_leave === 'Vacation Leave' ? Number(vacation_leave_points) - Number(total_days)
-                              : 0
-
-        const { error: creditPointsError} = await locals.supabase
-        .from('credit_points')
-        .update({ [where_to_update]:  updated_points})
-        .eq('employee_uuid', applicant_uuid)
-
-        if(creditPointsError){
-            return fail(500, {
-                error: true,
-                message: 'Failed to update points. Try again later.'
-            })
-        }
-          
+        }  
 
         await locals.logActivity(`Approved leave application for ${applicant_name} (ID: ${applicant_id}) as a HR`)
 
         await sendPushNotification(locals, applicant_uuid, 'Leave Application Update', `Your leave application has been approved by the HR.`);
-
-        await sendLeaveEmail('approved', applicant_email, leaveApprovedTemplate(applicant_name, type_leave, start_date, end_date, Number(total_days), hr_name))
 
         return { success: true }
 

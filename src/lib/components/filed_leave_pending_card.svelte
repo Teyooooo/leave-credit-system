@@ -91,18 +91,19 @@
 
 	function applicationReviewStatus(filedInfo: ClientFiledLeaveInfo) {
 		console.log({ filedInfo });
+		
+		if (!filedInfo.approve_by_dept_head && !filedInfo.approve_by_CD && !filedInfo.approve_by_HR) {
+			return 'Admin/HR';
+		}
 
-		if (!filedInfo.approve_by_dept_head && !filedInfo.approve_by_CD) {
+		if (!filedInfo.approve_by_dept_head && !filedInfo.approve_by_CD  && filedInfo.approve_by_HR) {
 			return 'Department Head';
 		}
 
-		if (filedInfo.approve_by_dept_head && !filedInfo.approve_by_CD) {
+		if (filedInfo.approve_by_dept_head && !filedInfo.approve_by_CD && filedInfo.approve_by_HR) {
 			return 'Campus Director';
 		}
 
-		if (filedInfo.approve_by_dept_head && filedInfo.approve_by_CD) {
-			return 'HR';
-		}
 
 		return 'Under Review';
 	}

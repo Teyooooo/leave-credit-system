@@ -77,6 +77,7 @@ export const load = (async ({locals, parent}) => {
             reason: item.reason,
             status: item.status,
             hr_name: item.hr?.employee_name ?? '-',
+            approve_by_HR: item.approve_by_HR,
             approve_by_dept_head: item.approve_by_dept_head,
             approve_by_CD: item.approve_by_CD,
         }))

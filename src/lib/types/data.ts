@@ -101,6 +101,7 @@ export interface ClientFiledLeaveInfo {
     reason: string,
     status: string,
     hr_name: string,
+    approve_by_HR: boolean,
     approve_by_dept_head: boolean,
     approve_by_CD: boolean,
 } 
