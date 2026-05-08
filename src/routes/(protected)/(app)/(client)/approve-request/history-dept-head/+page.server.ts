@@ -16,9 +16,10 @@ export const load = (async ({locals, parent}) => {
 
     let listOfEmployeeUuids: string[] = []
     if (!employeesError) {
-        console.log({ employees })
         listOfEmployeeUuids = employees?.map(i => (i?.uuid)) || []
     }
+    
+    console.log({ listOfEmployeeUuids })
 
     const { data, error } = await locals.supabase
             .from('filed_leave')
